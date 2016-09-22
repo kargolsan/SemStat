@@ -1,0 +1,32 @@
+#tabPane {
+    -fx-background-image: url("../Images/ApplicationView/tab_bg_pattern.jpg");
+    -fx-background-position: left top, center;
+    -fx-background-repeat: repeat;
+}
+
+.tab {
+    -fx-padding: 3pt 5pt 3pt 5pt;
+    -fx-background-insets: 0 0 0 0;
+    -fx-base: #404141;
+    -fx-focus-color: transparent;
+    -fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
+}
+.tab .tab-label
+{
+    -fx-text-fill: #fffca1;
+    -fx-padding: 0pt 4pt 0pt 2pt;
+    -fx-font-size: 9pt;
+    -fx-font-weight: bold;
+}
+
+.tab:selected
+{
+    -fx-base: #b30000;
+    -fx-padding: 3pt 5pt 4pt 5pt;
+
+}
+
+.tab-close-button:hover
+{
+    -fx-background-color: #fffca1;
+}

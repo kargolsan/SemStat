@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox id="root" alignment="CENTER" spacing="15.0" stylesheets="/Application/Resources/Assets/Styles/Loader.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.LoaderController">
+    <children>
+        <Label fx:id="title" id="title" text="Application" />
+        <Label fx:id="version" id="version" text="Version" />
+        <ImageView pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../Assets/Images/Icons/app.png" />
+            </image>
+        </ImageView>
+        <Label text="%application_loading" />
+    </children>
+    <padding>
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+    </padding>
+</VBox>

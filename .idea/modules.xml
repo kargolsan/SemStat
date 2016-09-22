@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SemStat.iml" filepath="$PROJECT_DIR$/.idea/modules/SemStat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SemStat_main.iml" filepath="$PROJECT_DIR$/.idea/modules/SemStat_main.iml" group="SemStat" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SemStat_test.iml" filepath="$PROJECT_DIR$/.idea/modules/SemStat_test.iml" group="SemStat" />
+    </modules>
+  </component>
+</project>

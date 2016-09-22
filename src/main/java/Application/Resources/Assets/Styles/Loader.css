@@ -1,0 +1,24 @@
+#root{
+    -fx-background-color: #2bc0f1;
+    -fx-border-color: #404141;
+    -fx-border-style: solid;
+    -fx-border-width: 1;
+}
+Label {
+    -fx-text-fill: #fffca1;
+    -fx-font-size: 14pt;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-weight: bold;
+}
+#title {
+    -fx-text-fill: #fffca1;
+    -fx-font-size: 20pt;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-weight: bold;
+}
+#version {
+    -fx-text-fill: #fffca1;
+    -fx-font-size: 15pt;
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-weight: bold;
+}
