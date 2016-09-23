@@ -20,9 +20,6 @@ import java.util.ResourceBundle;
 public class BottomStripController implements Initializable {
 
     @FXML
-    private Label threads;
-
-    @FXML
     private Label status;
 
     /** @var status */
@@ -53,6 +50,5 @@ public class BottomStripController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.status.textProperty().bind(statusProperty);
-        setStatus("Nowy status");
     }
 }

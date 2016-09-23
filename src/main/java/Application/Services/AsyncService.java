@@ -19,7 +19,7 @@ public class AsyncService {
     /**
      * Task asynchronous
      */
-    ExecutorService executor = Executors.newSingleThreadExecutor();
+    ExecutorService executorSingle = Executors.newSingleThreadExecutor();
 
     /**
      * Set true if function asynchronous is completed
@@ -32,21 +32,17 @@ public class AsyncService {
      * @param funcAsync function asynchronous
      * @param afterAsync function synchronous after completed async function
      */
-    public AsyncService(Runnable funcAsync, Runnable afterAsync) {
+    public void executorSingle(Runnable funcAsync, Runnable afterAsync) {
         completed.addListener((observable, oldValue, newValue) -> {
             if (newValue == true) {
-                Platform.runLater(() -> {
-                    afterAsync.run();
-                });
+                afterAsync.run();
             }
         });
 
-        executor.execute(() -> {
-            Platform.runLater(() -> {
-                funcAsync.run();
-                close(executor);
-                completed.setValue(true);
-            });
+        executorSingle.submit(() -> {
+            funcAsync.run();
+            close(executorSingle);
+            completed.setValue(true);
         });
     }
 

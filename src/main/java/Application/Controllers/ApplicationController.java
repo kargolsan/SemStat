@@ -22,9 +22,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class ApplicationController implements Initializable {
 
-    @FXML
-    private Label threads;
-
     /**
      * Called to initialize a controller after its root element has been
      * completely processed.
@@ -32,25 +29,5 @@ public class ApplicationController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Loader.getStage().hide();
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        BottomStripController.setStatus("Wątek główny przed sleep 2000");
-        LogsController.info("Wątek główny przed sleep 2000");
-
-        executor.submit(() -> {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            BottomStripController.setStatus("Wątek 2 po sleep 2000");
-            LogsController.info("Wątek 2 po sleep 2000");
-            LogsController.error("Wątek 2 po sleep 2000");
-            LogsController.success("Wątek 2 po sleep 2000");
-            LogsController.warning("Wątek 2 po sleep 2000");
-
-            new AsyncService(()->{}, ()->{}).close(executor);
-        });
     }
 }

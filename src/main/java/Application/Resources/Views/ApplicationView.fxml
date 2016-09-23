@@ -11,6 +11,11 @@
             <children>
                 <TabPane id="tabPane" fx:id="tabPane" focusTraversable="false" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <tabs>
+                   <Tab closable="false" text="%tabs.settings">
+                       <content>
+                           <fx:include fx:id="settings" source="Application/SettingsView.fxml" />
+                       </content>
+                   </Tab>
                   <Tab closable="false" text="%tabs.logs">
                     <content>
                         <fx:include fx:id="logs" source="Application/LogsView.fxml" />

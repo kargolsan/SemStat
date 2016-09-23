@@ -6,11 +6,9 @@
 
 <HBox spacing="5.0" stylesheets="@../../Assets/Styles/Application/BottomStrip.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.Application.BottomStripController">
     <children>
-        <Label text="%bottom_strip.quantity_threads" />
-        <Label id="threads" fx:id="threads" text="4" />
       <Label text="%bottom_strip.status">
          <HBox.margin>
-            <Insets left="10.0" />
+            <Insets />
          </HBox.margin>
       </Label>
       <Label id="status" fx:id="status" text="%bottom_strip.waiting_commands" />
