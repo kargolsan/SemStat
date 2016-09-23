@@ -1,0 +1,47 @@
+#levelColumn.table-column {
+  -fx-alignment: CENTER;
+}
+
+.table-row-cell:selected .text{
+    -fx-fill: black ;
+}
+
+.table-row-cell .text{
+    -fx-fill: black ;
+}
+
+.success.table-row-cell {
+    -fx-background-color: #c9ffa5;
+}
+.success.table-row-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: #dddddd;
+}
+
+
+.info.table-row-cell {
+    -fx-background-color: #d1fcff;
+}
+.info.table-row-cell:selected {
+    -fx-background-color: #dddddd;
+}
+
+
+.error.table-row-cell {
+    -fx-background-color: #ff9b9b;
+}
+.error.table-row-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: #dddddd;
+}
+
+
+.warning.table-row-cell {
+    -fx-background-color: #ffe29b;
+}
+.warning.table-row-cell:selected {
+    -fx-text-fill: white;
+    -fx-background-color: #dddddd;
+}
+
+

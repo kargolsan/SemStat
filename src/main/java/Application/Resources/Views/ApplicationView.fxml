@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="592.0" prefWidth="926.0" stylesheets="@../Assets/Styles/Application.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.ApplicationController">
@@ -14,11 +10,16 @@
         <AnchorPane VBox.vgrow="ALWAYS">
             <children>
                 <TabPane id="tabPane" fx:id="tabPane" focusTraversable="false" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <tabs>
-
-                    </tabs>
+               <tabs>
+                  <Tab closable="false" text="%tabs.logs">
+                    <content>
+                        <fx:include fx:id="logs" source="Application/LogsView.fxml" />
+                    </content>
+                  </Tab>
+               </tabs>
                 </TabPane>
             </children>
         </AnchorPane>
+        <fx:include fx:id="bottomStrip" source="Application/BottomStripView.fxml" />
     </children>
 </VBox>

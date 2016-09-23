@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="5.0" stylesheets="@../../Assets/Styles/Application/Logs.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.Application.LogsController">
+    <children>
+        <TableView id="logsTable" fx:id="logsTable" focusTraversable="false" prefHeight="262.0" prefWidth="443.0" VBox.vgrow="ALWAYS">
+            <placeholder>
+                <Label text="%tabs.logs.table.empty_logs" />
+            </placeholder>
+            <columns>
+                <TableColumn id="levelColumn" fx:id="levelColumn" editable="false" prefWidth="110.0" text="%tabs.logs.table.level" />
+                <TableColumn id="messageColumn" fx:id="messageColumn" editable="false" prefWidth="390.0" text="%tabs.logs.table.message" />
+                <TableColumn id="dateColumn" fx:id="dateColumn" editable="false" prefWidth="160.0" text="%tabs.logs.table.date" />
+            </columns>
+            <VBox.margin>
+                <Insets left="5.0" right="5.0" top="5.0" />
+            </VBox.margin>
+        </TableView>
+    </children>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+    </padding>
+</VBox>

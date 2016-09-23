@@ -3,6 +3,8 @@ package Application.Services;
 import javafx.application.Platform;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
@@ -17,7 +19,7 @@ public class AsyncService {
     /**
      * Task asynchronous
      */
-    ExecutorService task = Executors.newSingleThreadExecutor();
+    ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
      * Set true if function asynchronous is completed
@@ -30,7 +32,7 @@ public class AsyncService {
      * @param funcAsync function asynchronous
      * @param afterAsync function synchronous after completed async function
      */
-    public void run(Runnable funcAsync, Runnable afterAsync) {
+    public AsyncService(Runnable funcAsync, Runnable afterAsync) {
         completed.addListener((observable, oldValue, newValue) -> {
             if (newValue == true) {
                 Platform.runLater(() -> {
@@ -39,11 +41,28 @@ public class AsyncService {
             }
         });
 
-        task.execute(() -> {
+        executor.execute(() -> {
             Platform.runLater(() -> {
                 funcAsync.run();
+                close(executor);
                 completed.setValue(true);
             });
         });
+    }
+
+    /**
+     * Close executor
+     *
+     * @param executor
+     */
+    public void close(ExecutorService executor){
+        try {
+            executor.shutdown();
+            executor.awaitTermination(0, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e) {}
+        finally {
+            executor.shutdownNow();
+        }
     }
 }
