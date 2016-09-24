@@ -38,6 +38,9 @@ public class PreSearchService implements IPreSearchesService {
     /** @var id custom engine search google */
     private String cxId;
 
+    /** @var custom search */
+    Customsearch custom;
+
     /** @var application name */
     private static final String APPLICATION_NAME = PropertyService.get("projectName", "Application/Resources/properties.properties");
 
@@ -45,8 +48,15 @@ public class PreSearchService implements IPreSearchesService {
      * Constructor
      */
     public PreSearchService(){
-        this.keyApi = SettingsService.get("google.api_key4");
+        this.keyApi = SettingsService.get("google.api_key");
         this.cxId = SettingsService.get("google.search_engine_id");
+
+        HttpRequestInitializer httpRequestInitializer = new HttpRequestInitializer() {
+            @Override
+            public void initialize(HttpRequest request) throws IOException {}
+        };
+        JsonFactory jsonFactory = new JacksonFactory();
+        this.custom = new Customsearch.Builder(new NetHttpTransport(), jsonFactory, httpRequestInitializer).setApplicationName(APPLICATION_NAME).build();
     }
 
     /**
@@ -57,31 +67,31 @@ public class PreSearchService implements IPreSearchesService {
      */
     public List<IResultModel> get(String query, Integer page){
 
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         List<IResultModel> result = new ArrayList<IResultModel>();
 
         query = String.format("\"%1$s\"", query);
 
-        HttpRequestInitializer httpRequestInitializer = new HttpRequestInitializer() {
-            @Override
-            public void initialize(HttpRequest request) throws IOException {}
-        };
-
-        JsonFactory jsonFactory = new JacksonFactory();
-
-        Customsearch custom = new Customsearch.Builder(new NetHttpTransport(), jsonFactory, httpRequestInitializer).setApplicationName(APPLICATION_NAME).build();
-
         try {
-            Customsearch.Cse.List list = custom.cse().list(query);
+            Customsearch.Cse.List list = this.custom.cse().list(query);
             list.setCx(this.cxId);
             list.setKey(this.keyApi);
-            page = (page == 1) ? 1 : (page * 10) + 1;
+            page = (page == 1) ? 1 : ((page * 10) + 1) -10;
             list.setStart((long) page);
             Search results = list.execute();
+
+            if (! results.containsKey("items")){
+                return result;
+            }
 
             for (Result i : results.getItems()){
                 IResultModel r = new Modules.PreSearchers.Google.Models.Result();
                 r.setTitle(i.getTitle());
-                r.setUrl(i.getDisplayLink());
+                r.setUrl(i.getLink());
                 result.add(r);
             }
         }

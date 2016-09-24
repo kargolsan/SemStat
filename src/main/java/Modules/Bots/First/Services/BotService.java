@@ -121,7 +121,6 @@ public class BotService implements IBotService {
 
         while(true) {
             List<IResultModel> r = this.preSearch.get(keyWords, page);
-
             if (r.size() == 0 || this.stop == true){
                 break;
             } else if (limitPerUrls <=result.size()){

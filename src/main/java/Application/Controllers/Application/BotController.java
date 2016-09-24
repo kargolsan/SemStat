@@ -3,9 +3,8 @@ package Application.Controllers.Application;
 import Application.Contracts.Bots.IBotService;
 import Application.Contracts.PreSearches.IPreSearchesService;
 import Modules.Bots.First.Services.BotService;
-import Modules.Crawlers.Selenium.Services.BrowserService;
 import Modules.Data.File.Services.DataService;
-import Modules.PreSearchers.MonsterCrawler.Services.PreSearchService;
+import Modules.PreSearchers.Google.Services.PreSearchService;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -43,7 +42,7 @@ public class BotController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.preSearch = new PreSearchService(new BrowserService().getDriver());
+        this.preSearch = new PreSearchService(); //new BrowserService().getDriver()
         BottomStripController.setStatus("Robot gotowy do pracy");
     }
 
