@@ -14,7 +14,7 @@
             </placeholder>
             <columns>
                 <TableColumn id="levelColumn" fx:id="levelColumn" editable="false" prefWidth="110.0" text="%tabs.logs.table.level" />
-                <TableColumn id="messageColumn" fx:id="messageColumn" editable="false" prefWidth="390.0" text="%tabs.logs.table.message" />
+                <TableColumn id="messageColumn" fx:id="messageColumn" editable="false" prefWidth="590.0" text="%tabs.logs.table.message" />
                 <TableColumn id="dateColumn" fx:id="dateColumn" editable="false" prefWidth="160.0" text="%tabs.logs.table.date" />
             </columns>
             <VBox.margin>

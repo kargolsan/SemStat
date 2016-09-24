@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 public class LanguageService {
 
     /** @var logger */
-    private static final Logger logger = LogManager.getLogger(PropertyService.class);
+    private static final Logger logger = LogManager.getLogger(LanguageService.class);
 
     /**
      * Gets the unicode friendly resource bundle

@@ -37,13 +37,6 @@ public class BottomStripController implements Initializable {
     }
 
     /**
-     * Controller
-     */
-    public BottomStripController(){
-
-    }
-
-    /**
      * Called to initialize a controller after its root element has been
      * completely processed.
      */

@@ -16,9 +16,7 @@ import javafx.beans.property.SimpleBooleanProperty;
  */
 public class AsyncService {
 
-    /**
-     * Task asynchronous
-     */
+    /** @vars Tasks asynchronous */
     ExecutorService executorSingle = Executors.newSingleThreadExecutor();
 
     /**
@@ -32,7 +30,7 @@ public class AsyncService {
      * @param funcAsync function asynchronous
      * @param afterAsync function synchronous after completed async function
      */
-    public void executorSingle(Runnable funcAsync, Runnable afterAsync) {
+    public void single(Runnable funcAsync, Runnable afterAsync) {
         completed.addListener((observable, oldValue, newValue) -> {
             if (newValue == true) {
                 afterAsync.run();
