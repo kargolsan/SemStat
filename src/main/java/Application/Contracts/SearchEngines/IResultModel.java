@@ -1,4 +1,4 @@
-package Application.Contracts.PreSearches;
+package Application.Contracts.SearchEngines;
 
 /**
  * Created by IntelliJ IDEA.

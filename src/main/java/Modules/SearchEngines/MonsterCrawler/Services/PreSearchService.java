@@ -1,8 +1,9 @@
-package Modules.PreSearchers.MonsterCrawler.Services;
+package Modules.SearchEngines.MonsterCrawler.Services;
 
-import Application.Contracts.PreSearches.IPreSearchesService;
-import Application.Contracts.PreSearches.IResultModel;
-import Modules.PreSearchers.MonsterCrawler.Models.Result;
+import Application.Contracts.SearchEngines.ILimitQueriesService;
+import Application.Contracts.SearchEngines.ISearchEngine;
+import Application.Contracts.SearchEngines.IResultModel;
+import Modules.SearchEngines.MonsterCrawler.Models.Result;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -21,7 +22,7 @@ import java.util.List;
  * Date: 23.09.2016
  * Time: 16:08
  */
-public class PreSearchService implements IPreSearchesService {
+public class PreSearchService implements ISearchEngine {
 
     /** @var driver */
     WebDriver driver;
@@ -65,5 +66,15 @@ public class PreSearchService implements IPreSearchesService {
             }
         } catch (Exception e) {}
         return result;
+    }
+
+    /**
+     * Get limit service
+     *
+     * @return limit service
+     */
+    @Override
+    public ILimitQueriesService getLimit() {
+        return null;
     }
 }

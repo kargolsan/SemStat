@@ -1,6 +1,6 @@
-package Modules.PreSearchers.Google.Models;
+package Modules.SearchEngines.Google.Models;
 
-import Application.Contracts.PreSearches.IResultModel;
+import Application.Contracts.SearchEngines.IResultModel;
 
 /**
  * Created by IntelliJ IDEA.

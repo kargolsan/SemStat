@@ -16,6 +16,11 @@
                            <fx:include fx:id="bot" source="Application/BotView.fxml" />
                        </content>
                    </Tab>
+                   <Tab closable="false" text="%tabs.sources">
+                       <content>
+                           <fx:include fx:id="sources" source="Application/SourcesView.fxml" />
+                       </content>
+                   </Tab>
                   <Tab closable="false" text="%tabs.logs">
                     <content>
                         <fx:include fx:id="logs" source="Application/LogsView.fxml" />

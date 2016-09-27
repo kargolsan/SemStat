@@ -11,6 +11,7 @@ repositories {
 }
 
 dependencies {
+    compile group: "mysql", name: "mysql-connector-java", version: "6.0.4"
     compile group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.8.3"
     compile group: "org.apache.commons", name: "commons-lang3", version: "3.4"
     compile "com.google.apis:google-api-services-customsearch:v1-rev51-1.22.0"
@@ -22,12 +23,12 @@ dependencies {
     testCompile group: "junit", name: "junit", version: "4.11"
 }
 
-// Ustalenie biblioteki wrapper gradle na wersję 3.0
+// Przełączenie biblioteki gradle do wersji 3.0
 task wrapper(type: Wrapper) {
     gradleVersion = "3.0"
 }
 
-// Kopiowanie plików z folderu source do resource
+// Kopiowanie bibliotek dla wersji produkcyjnej
 sourceSets {
     main {
         resources {
@@ -38,8 +39,8 @@ sourceSets {
     }
 }
 
-// Utworzenie pliku z danymi o aplikacji
-// które są wykorzystywane jednocześnie w gradle oraz projekcie java
+// Domyślne ustawienia ustalane w jednym miejscu
+// a następnie przekazywane do działającej aplikacji
 File file = new File("$project.rootDir/src/main/java/Application/Resources/properties.properties")
 Properties props = new Properties()
 props.setProperty("version", version)
@@ -47,4 +48,9 @@ props.setProperty("title", title)
 props.setProperty("iconApp", iconApp)
 props.setProperty("projectName", project.name)
 props.setProperty("url", url)
+props.setProperty("default_processor_limit_threads", "10")
+props.setProperty("default_google_queries_of_keyword", "1")
+props.setProperty("minimality_urls_in_file_for_long_analyzed", "15")
+props.setProperty("default_robot_limit_sub_site_analyze_domain", "15")
+props.setProperty("user_agent", "Application SemStat ${version} for SEO & SEM. Visit www.itgolo.pl.")
 props.store(file.newWriter(), null)

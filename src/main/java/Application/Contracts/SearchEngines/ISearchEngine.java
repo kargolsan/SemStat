@@ -1,4 +1,4 @@
-package Application.Contracts.PreSearches;
+package Application.Contracts.SearchEngines;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * Date: 23.09.2016
  * Time: 23:18
  */
-public interface IPreSearchesService {
+public interface ISearchEngine {
 
     /**
      * Ger search results
@@ -18,4 +18,11 @@ public interface IPreSearchesService {
      * @return list with results
      */
     List<IResultModel> get(String query, Integer page);
+
+    /**
+     * Get limit service
+     *
+     * @return limit service
+     */
+    ILimitQueriesService getLimit();
 }

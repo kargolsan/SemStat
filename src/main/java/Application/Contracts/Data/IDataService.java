@@ -16,11 +16,4 @@ public interface IDataService {
      * @param data
      */
     void save(List<IDataModel> data);
-
-    /**
-     * Check is exist domain with keyword
-     *
-     * @param data
-     */
-    Boolean exist(IDataModel data);
 }

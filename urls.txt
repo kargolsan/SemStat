@@ -1,0 +1,15 @@
+http://www.nekst.pl/document?query={{keyword}}&pageIndex=0
+http://www.nekst.pl/document?query={{keyword}}&pageIndex=1
+http://www.nekst.pl/document?query={{keyword}}&pageIndex=2
+http://www.nekst.pl/document?query={{keyword}}&pageIndex=3
+http://www.nekst.pl/document?query={{keyword}}&pageIndex=4
+http://szukaj.onet.pl/wyniki.html?qt={{keyword}}
+http://szukaj.onet.pl/0,2,query.html?qt={{keyword}}
+http://szukaj.onet.pl/0,3,query.html?qt={{keyword}}
+http://szukaj.onet.pl/0,4,query.html?qt={{keyword}}
+http://szukaj.onet.pl/0,5,query.html?qt={{keyword}}
+http://szukaj.wp.pl/szukaj.html?q={{keyword}}
+http://szukaj.wp.pl/szukaj.html?p=2&q={{keyword}}
+http://szukaj.wp.pl/szukaj.html?p=3&q={{keyword}}
+http://szukaj.wp.pl/szukaj.html?p=4&q={{keyword}}
+http://szukaj.wp.pl/szukaj.html?p=5&q={{keyword}}

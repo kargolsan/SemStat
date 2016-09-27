@@ -1,27 +1,27 @@
 package Modules.Bots.First.Services;
 
-import Application.Contracts.Bots.IBotService;
-import Application.Contracts.PreSearches.IPreSearchesService;
-import Application.Contracts.PreSearches.IResultModel;
+import Application.Contracts.SearchEngines.ISearchEngine;
+import Application.Contracts.SearchEngines.IResultModel;
 import Application.Contracts.Data.IDataModel;
 import Application.Contracts.Data.IDataService;
+import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.BottomStripController;
 import Application.Controllers.Application.LogsController;
 import Application.Services.Application.SettingsService;
-import Application.Services.AsyncService;
+import Application.Services.PropertyService;
 import Modules.Data.File.Models.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,185 +29,286 @@ import java.util.concurrent.Executors;
  * Date: 23.09.2016
  * Time: 17:11
  */
-public class BotService implements IBotService {
-
-    /** @var call stop crawler */
-    private Boolean stop = false;
-
-    /** @var data to save */
-    private List<IDataModel> dataToSave;
-
-    /** @var save service */
-    private IPreSearchesService preSearch;
-
-    /** @var save service */
-    private IDataService save;
-
-    /** @var runnable after stop */
-    Runnable afterStop;
-
-    /** @var runnable after end */
-    Runnable afterEnd;
+public class BotService {
 
     /**
-     * Stop robot
+     * @var interrupt analyzer
      */
-    public void callStop() {
-        this.stop = true;
+    private Boolean interrupt = false;
+
+    /**
+     * @var domain analyzed
+     */
+    private Map<String, Integer> domainsAnalyzed;
+
+    /** @cvar urls to analyze */
+    private List<String> urlsToAnalyze;
+
+    /**
+     * @var list data for save
+     */
+    private List<IDataModel> listData;
+
+    /**
+     * @var search engine
+     */
+    private ISearchEngine searchEngine;
+
+    /**
+     * @var data save service
+     */
+    private IDataService data;
+
+    /**
+     * @var runnable for finally threads
+     */
+    Runnable finallyThreads;
+
+    /**
+     * @var processor service
+     */
+    ProcessorService processor;
+
+    /**
+     * @var analyze search engine service
+     */
+    AnalyzeSearchEngineService analyzeSearchEngine;
+
+    /**
+     * @var analyze long service
+     */
+    AnalyzeLong analyzeLong;
+
+    /**
+     * @var resource bundle
+     */
+    private ResourceBundle bundle;
+
+    /**
+     * @var results search engine
+     */
+    ResultsSearchEngineService resultsSearchEngine;
+
+    /** @var counter analyzed websites */
+    Integer countAnalyzeWebsites;
+
+    /** @var count websites with keyword */
+    Integer countWebsitesWithKeyword;
+
+    /**
+     * @var file with properties of application
+     */
+    private static final String PROPERTIES_FILE = "Application/Resources/properties.properties";
+
+    /**
+     * Get urls to analyze
+     *
+     * @return urls
+     */
+    public List<String> getUrlsToAnalyze() {
+        return urlsToAnalyze;
     }
 
     /**
      * Constructor
      *
-     * @param preSearch
-     * @param save
+     * @param searchEngine
+     * @param data
+     * @param finallyThreads
+     * @param bundle
      */
-    public BotService(IPreSearchesService preSearch, IDataService save){
-        this.dataToSave = new ArrayList<IDataModel>();
-        this.preSearch = preSearch;
-        this.save = save;
+    public BotService(ISearchEngine searchEngine, IDataService data, Runnable finallyThreads, ResourceBundle bundle) {
+        this.listData = new ArrayList<>();
+        this.urlsToAnalyze = new ArrayList<>();
+        this.domainsAnalyzed = new HashMap<String, Integer>();
+
+        this.searchEngine = searchEngine;
+        this.data = data;
+        this.finallyThreads = finallyThreads;
+        this.bundle = bundle;
+
+        this.resultsSearchEngine = new ResultsSearchEngineService();
+        this.processor = new ProcessorService();
+        this.analyzeSearchEngine = new AnalyzeSearchEngineService(this, this.bundle);
+        this.analyzeLong = new AnalyzeLong(this, this.bundle);
     }
 
     /**
      * Rub robot
      *
-     * @param keyWords
-     * @param afterEnd
-     * @param afterStop
+     * @param keyword
      */
-    public void run(String keyWords, Runnable afterEnd, Runnable afterStop) {
-        this.afterEnd = afterEnd;
-        this.afterStop = afterStop;
+    public void start(String keyword) {
 
-        BottomStripController.setStatus(String.format("Uruchamianie robota..."));
+        this.interrupt = false;
 
-        AsyncService async = new AsyncService();
-        async.single(() -> {
-            List<IResultModel> result = getPreUrls(keyWords);
+        this.listData.clear();
+        this.domainsAnalyzed.clear();
+        this.urlsToAnalyze.clear();
 
-            LogsController.info("Zakończono zbieranie wstępnych adresów internetowych.");
+        this.countAnalyzeWebsites = 0;
+        this.countWebsitesWithKeyword = 0;
 
-            if (this.stop == true){
-                stop();
-                return;
-            }
+        List<IResultModel> webSitesSearchEngine = this.resultsSearchEngine.getResultsSearchEngine(keyword, this.searchEngine, this.interrupt, this.bundle);
 
-            if (result.size() == 0){
-                LogsController.warning("Nie pobrano wstępnych adresów stron. Proszę odczekać kilka minut lub zmienić silnik wstępnego szukania.");
-                stop();
-                return;
-            }
-            crawler(result, keyWords);
-        }, () -> {});
+        automationBot(webSitesSearchEngine, keyword);
     }
 
     /**
-     * Ger pre urls from search engine
+     * Run automation bot
      *
-     * @param keyWords
-     * @return list pre urls
+     * @param webSitesSearchEngine
+     * @param keyword
      */
-    private List<IResultModel> getPreUrls(String keyWords) {
-        String lpu = SettingsService.get("bot.limit_pre_urls");
-        lpu = (lpu == "") ? "999" : lpu;
+    private void automationBot(List<IResultModel> webSitesSearchEngine, String keyword) {
 
-        Integer limitPerUrls = 999;
-        try {
-            limitPerUrls = Integer.parseInt(lpu);
-        } catch(Exception e){}
+        ExecutorService executor = Executors.newFixedThreadPool(processor.getLimitThreads());
 
-        List<IResultModel> result = new ArrayList<IResultModel>();
-        Integer page = 1;
+        this.analyzeSearchEngine.analyzeWebSitesSearchEngine(executor, webSitesSearchEngine, keyword);
 
-        while(true) {
-            List<IResultModel> r = this.preSearch.get(keyWords, page);
-            if (r.size() == 0 || this.stop == true){
-                break;
-            } else if (limitPerUrls <=result.size()){
-                break;
-            }
-            result.addAll(r);
-            page++;
-            BottomStripController.setStatus(String.format("Zbieranie wstępnych adresów storn internetowych. Zebrano %1$s", result.size()));
-        }
-
-        return result;
-    }
-
-    /**
-     * Crawler on websites
-     *
-     * @param urls
-     * @param keyWord
-     */
-    private void crawler(List<IResultModel> urls, String keyWord) {
-        Integer threadLimit = getLimitThreads();
-        threadLimit = (threadLimit < 4) ? 2 : threadLimit -2;
-
-        ExecutorService executor = Executors.newFixedThreadPool(threadLimit);
-
-        Integer counter = 1;
-        for (IResultModel u : urls) {
-            if (this.stop == true){
-                stop();
-                return;
-            }
-            executor.execute(() -> {
-
-                try {
-                    Document doc = Jsoup.connect(u.getUrl()).get();
-                    BottomStripController.setStatus(String.format("Sprawdzanie strony internetowej: %1$s", doc.baseUri()));
-
-                    addToSave(doc, keyWord);
-
-                } catch (IOException e) {}
-
-            });
-        }
         executor.shutdown();
+
         while (!executor.isTerminated()) {
         }
-        finish();
-    }
 
-    /**
-     * Get limit threads of processor
-     *
-     * @return quantity threads
-     */
-    private Integer getLimitThreads() {
-        String lt = SettingsService.get("processor.limit_threads");
-        if (lt == "") return 10;
+        ExecutorService executorLong = Executors.newFixedThreadPool(processor.getLimitThreads());
 
-        try {
-            return Integer.parseInt(lt);
-        } catch (Exception ex) {
+        this.analyzeLong.start(executorLong, keyword);
+
+        executorLong.shutdown();
+
+        while (!executorLong.isTerminated()) {
         }
-        return 10;
+
+        finish(keyword);
     }
 
     /**
-     * Save result
+     * add data to list data
+     *
+     * @param data
+     */
+    public void addToListData(IDataModel data) {
+        this.countWebsitesWithKeyword += 1;
+        BotController.setQuantityWebsitesWithKeywordProperty(this.countWebsitesWithKeyword.toString());
+
+        this.listData.add(data);
+    }
+
+    /**
+     * Finish analyze
+     *
+     * @param keyword
+     */
+    private void finish(String keyword) {
+        BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.data_saving"), keyword));
+
+        this.data.save(this.listData);
+        this.finallyThreads.run();
+
+        LogsController.success(String.format(this.bundle.getString("robot.log.data_saved"), keyword));
+        BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.job_finished"), keyword));
+        LogsController.success(String.format(this.bundle.getString("robot.log.job_finished"), keyword));
+    }
+
+    /**
+     * Stop analyze
+     *
+     * @param keyword
+     */
+    private void stop(String keyword) {
+
+//        if (this.listData.size() > 0) {
+//            this.data.save(this.listData);
+//            this.listData.clear();
+//            LogsController.success(String.format(this.bundle.getString("robot.log.saved_analyzed_data_interrupted"), keyword));
+//        }
+
+//        BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.bot_interrupted"), keyword));
+//        LogsController.info(String.format(this.bundle.getString("robot.log.bot_interrupted"), keyword));
+
+//        this.domainsAnalyzed.clear();
+//        this.finallyThreads.run();
+    }
+
+
+    /**
+     * Interrupt robot
+     */
+    public void interrupt() {
+        this.interrupt = true;
+    }
+
+    /**
+     * Check bot is interrupted
+     *
+     * @return true if interrupted or false if don't interrupted
+     */
+    public Boolean isInterrupted() {
+        if (this.interrupt == true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Document of JSOUP to DataModel
+     *
+     * @param doc
+     * @param keyword
+     */
+    public IDataModel docToDataModel(Document doc, String keyword) {
+
+        this.countAnalyzeWebsites += 1;
+        BotController.setAnalyzedWebsitesProperty(this.countAnalyzeWebsites.toString());
+
+        String text = doc.select("body").text();
+        if (text.toLowerCase().contains(keyword.toLowerCase())) {
+            if (getDomainName(doc.baseUri()) == null) return null;
+
+            Integer quantity = StringUtils.countMatches(text.toLowerCase(), keyword.toLowerCase());
+            IDataModel data = new Data();
+            data.setDomain(getDomainName(doc.baseUri()));
+            data.setUrl(doc.baseUri());
+            data.setQuantity(quantity);
+            data.setDate(Calendar.getInstance());
+            data.setKeyword(keyword);
+
+            return data;
+        }
+
+        return null;
+    }
+
+    /**
+     * parse urls from document
      *
      * @param doc
      */
-    private void addToSave(Document doc, String keyWord){
-        String text = doc.select("body").text();
+    public List<String> docToUrls(Document doc) {
 
-        if (text.toLowerCase().contains(keyWord.toLowerCase())){
-            try {
-                Integer quantity = StringUtils.countMatches(text.toLowerCase(), keyWord.toLowerCase());
-                IDataModel data = new Data();
-                data.setDomain(getDomainName(doc.baseUri()));
-                data.setUrl(doc.baseUri());
-                data.setQuantity(quantity);
-                data.setDate(Calendar.getInstance());
-                data.setKeyword(keyWord);
-                this.dataToSave.add(data);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
+        List<String> results = new ArrayList<>();
+
+        Elements links = doc.body().getElementsByTag("a");
+
+        for (Element link : links) {
+            String href = link.attr("href");
+            if (href != "" && href.contains("http://") || href.contains("https://")) {
+                if (!href.startsWith("http")){
+                    List<String> extractedUrls = extractUrls(href);
+                    for (String url : extractedUrls)
+                    {
+                        results.add(url);
+                    }
+                } else {
+                    results.add(href);
+                }
+
             }
         }
+
+        return results;
     }
 
     /**
@@ -215,32 +316,61 @@ public class BotService implements IBotService {
      *
      * @param url
      * @return
-     * @throws URISyntaxException
      */
-    public String getDomainName(String url) throws URISyntaxException {
-        URI uri = new URI(url);
-        String domain = uri.getHost();
-        return domain.startsWith("www.") ? domain.substring(4) : domain;
+    public String getDomainName(String url) {
+        URI uri = null;
+        try {
+            uri = new URI(url);
+            String domain = uri.getHost();
+            return domain.startsWith("www.") ? domain.substring(4) : domain;
+        } catch (URISyntaxException e) {
+        }
+        return null;
     }
 
     /**
-     * Finish analyze
+     * Add domains
+     *
+     * @param urlsFromDoc
      */
-    private void finish(){
-        BottomStripController.setStatus("Rozpoczynanie zapisywania danych");
-        this.save.save(this.dataToSave);
-        this.afterEnd.run();
-        BottomStripController.setStatus("Zakończono pracę robota");
-        LogsController.success("Zakończono pracę robota.");
+    public void addUrlsForAnalyze(List<String> urlsFromDoc) {
+        for (String urlFromDoc : urlsFromDoc) {
+
+            String domainFromDoc = getDomainName(urlFromDoc);
+            if (domainFromDoc == null) continue;
+
+            if (!this.domainsAnalyzed.containsKey(domainFromDoc)) this.domainsAnalyzed.put(domainFromDoc, 0);
+
+            String getRLS = SettingsService.get("robot.limit_sub_site_analyze_domain");
+            String defaultRLS = PropertyService.get("default_robot_limit_sub_site_analyze_domain", PROPERTIES_FILE);
+
+            getRLS = (getRLS == "") ? defaultRLS : getRLS;
+            Integer limitDomain = Integer.parseInt(getRLS);
+
+            if (this.domainsAnalyzed.get(domainFromDoc) >= limitDomain) continue;
+
+            this.domainsAnalyzed.put(domainFromDoc, this.domainsAnalyzed.get(domainFromDoc) + 1);
+
+            this.urlsToAnalyze.add(urlFromDoc);
+        }
     }
 
     /**
-     * Stop analyze
+     * Returns a list with all links contained in the input
      */
-    private void stop(){
-        this.stop = true;
-        BottomStripController.setStatus("Działanie robota przerwane");
-        LogsController.info("Działanie robota przerwane.");
-        this.afterStop.run();
+    public static List<String> extractUrls(String text)
+    {
+        List<String> containedUrls = new ArrayList<String>();
+        String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+        Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+        Matcher urlMatcher = pattern.matcher(text);
+
+        while (urlMatcher.find())
+        {
+            containedUrls.add(text.substring(urlMatcher.start(0),
+                    urlMatcher.end(0)));
+        }
+
+        return containedUrls;
     }
 }

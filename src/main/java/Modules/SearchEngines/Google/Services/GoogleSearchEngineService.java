@@ -1,7 +1,8 @@
-package Modules.PreSearchers.Google.Services;
+package Modules.SearchEngines.Google.Services;
 
-import Application.Contracts.PreSearches.IPreSearchesService;
-import Application.Contracts.PreSearches.IResultModel;
+import Application.Contracts.SearchEngines.ILimitQueriesService;
+import Application.Contracts.SearchEngines.ISearchEngine;
+import Application.Contracts.SearchEngines.IResultModel;
 import Application.Controllers.Application.LogsController;
 import Application.Services.Application.SettingsService;
 import Application.Services.PropertyService;
@@ -27,10 +28,10 @@ import java.util.List;
  * Date: 23.09.2016
  * Time: 10:47
  */
-public class PreSearchService implements IPreSearchesService {
+public class GoogleSearchEngineService implements ISearchEngine {
 
     /** @var logger */
-    private static final Logger logger = LogManager.getLogger(PreSearchService.class);
+    private static final Logger logger = LogManager.getLogger(GoogleSearchEngineService.class);
 
     /** @var key api google search custom */
     private String keyApi;
@@ -41,13 +42,26 @@ public class PreSearchService implements IPreSearchesService {
     /** @var custom search */
     Customsearch custom;
 
+    /** @var limit service */
+    ILimitQueriesService limit;
+
     /** @var application name */
     private static final String APPLICATION_NAME = PropertyService.get("projectName", "Application/Resources/properties.properties");
 
     /**
+     * Get limit service
+     *
+     * @return
+     */
+    public ILimitQueriesService getLimit() {
+        return limit;
+    }
+
+    /**
      * Constructor
      */
-    public PreSearchService(){
+    public GoogleSearchEngineService(){
+        this.limit = new LimitQueriesService();
         this.keyApi = SettingsService.get("google.api_key");
         this.cxId = SettingsService.get("google.search_engine_id");
 
@@ -63,9 +77,11 @@ public class PreSearchService implements IPreSearchesService {
      * Get list results from google search
      *
      * @param query
-     * @param page
+     * @param queryCount
      */
-    public List<IResultModel> get(String query, Integer page){
+    public List<IResultModel> get(String query, Integer queryCount){
+
+        Integer page = queryCount + 1;
 
         try {
             Thread.sleep(500);
@@ -89,7 +105,7 @@ public class PreSearchService implements IPreSearchesService {
             }
 
             for (Result i : results.getItems()){
-                IResultModel r = new Modules.PreSearchers.Google.Models.Result();
+                IResultModel r = new Modules.SearchEngines.Google.Models.Result();
                 r.setTitle(i.getTitle());
                 r.setUrl(i.getLink());
                 result.add(r);

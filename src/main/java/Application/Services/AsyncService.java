@@ -45,6 +45,18 @@ public class AsyncService {
     }
 
     /**
+     * Run async task with task after completed async
+     *
+     * @param funcAsync function asynchronous
+     */
+    public void single(Runnable funcAsync) {
+        executorSingle.submit(() -> {
+            funcAsync.run();
+            close(executorSingle);
+        });
+    }
+
+    /**
      * Close executor
      *
      * @param executor
