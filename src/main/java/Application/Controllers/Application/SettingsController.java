@@ -3,6 +3,9 @@ package Application.Controllers.Application;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
+
+import Application.Services.AlertService;
 import Application.Services.Application.SettingsService;
 import Application.Services.PropertyService;
 import javafx.collections.FXCollections;
@@ -128,6 +131,7 @@ public class SettingsController implements Initializable {
         SettingsService.add("mysql.table.column_keyword", this.mysqlColumnKeyword.getText());
 
         LogsController.success(this.bundle.getString("tabs.settings.setting_saved"));
+        AlertService.info(this.bundle.getString("dialog_alert.information"), null, this.bundle.getString("tabs.settings.setting_saved"));
     }
 
     /**
@@ -183,6 +187,7 @@ public class SettingsController implements Initializable {
         String database = this.mysqlDatabase.getText();
         String username = this.mysqlUsername.getText();
         String password = this.mysqlPassword.getText();
+        String timezone = TimeZone.getDefault().getID();
 
         if (host.contains("http://")) host = host.replace("http://", "");
         if (host.contains("https://")) host = host.replace("https://", "");
@@ -191,17 +196,19 @@ public class SettingsController implements Initializable {
         Statement st = null;
         ResultSet rs = null;
 
-        String connectionString = String.format("jdbc:mysql://%1$s:%2$s/%3$s", host, port, database);
+        String connectionString = String.format("jdbc:mysql://%1$s:%2$s/%3$s?useLegacyDatetimeCode=false&serverTimezone=%4$s", host, port, database, timezone);
 
         try {
 
             con = DriverManager.getConnection(connectionString, username, password);
             st = con.createStatement();
-            rs = st.executeQuery("SELECT VERSION()");
-            LogsController.error(this.bundle.getString("robot.log.success_test_connection_mysql"));
+            rs = st.executeQuery("select * from information_schema.tables");
+            LogsController.success(this.bundle.getString("robot.log.success_test_connection_mysql"));
+            AlertService.info(this.bundle.getString("dialog_alert.information"), null, this.bundle.getString("robot.log.success_test_connection_mysql"));
 
         } catch (SQLException ex) {
             LogsController.error(String.format(this.bundle.getString("robot.log.failed_test_connection_mysql"), ex.getMessage()));
+            AlertService.error(this.bundle.getString("dialog_alert.error"), null, this.bundle.getString("robot.log.failed_test_connection_mysql"));
         } finally {
             try {
                 if (rs != null) {

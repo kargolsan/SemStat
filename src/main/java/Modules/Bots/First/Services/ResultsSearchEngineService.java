@@ -3,8 +3,6 @@ package Modules.Bots.First.Services;
 import Application.Contracts.SearchEngines.IResultModel;
 import Application.Contracts.SearchEngines.ISearchEngine;
 import Application.Controllers.Application.BottomStripController;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;

@@ -1,5 +1,14 @@
+#SemStat for SEO and SEM
+
+![interface_robot](https://cloud.githubusercontent.com/assets/12084504/18873464/e5616752-84bf-11e6-9894-74fe7bcb5d9c.jpg)
+
 ## Description
-This robot get unique domain with website content keyword.
+This robot get unique domain with website content keyword. Interface is for English and Polish languages.
+
+## License
+
+![88x31](https://cloud.githubusercontent.com/assets/12084504/18874988/46d29e30-84c4-11e6-97c7-0ffc2229e0eb.png)
+Creative Commons. Attribution-NonCommercial-NoDerivatives 3.0 International (CC BY-NC-ND 3.0)
 
 ## Before run application
 - Install Chrome Web Browser in your system
@@ -31,5 +40,37 @@ For FREE Queries in Google API, limit day in 100 queries.
 
 Example: ```1 queries for keyword``` get 10 results links of keyword from Google Search Engine API.
 
+## Configuration MySQL
+Create table in your mysql server with 5 columns:
+- for ```domains``` (String) [255]
+- for ```url``` (Text)
+- for ```quantity``` (Integer) [4]
+- for ```date``` (Timestamp)
+- for ```keyword``` (String) [100]
+
+Your table name and column name add to configuration application in setting tab.
+
 ## Deploy
-- Add chrome browser driver to ```drivers``` folder of application
+
+####Requirements
+
+- Java 8 or higher. Gradle must run with Java 8
+- Wix Toolset or WixEdit must be installed
+- Add variable ProgramFiles(x86) to system path when value is ProgramFiles directory of x86 architecture in your system Windows
+- Add variable ProgramW6432 to system path when value is ProgramFiles directory of x64 architecture in your system Windows
+
+#### Steps
+
+For create *.msi run tasks of gradle:
+
+- gradle clean
+- gradle assemble
+- gradle.build
+- gradle copyLibs
+- gradle copyDrivers
+- gradle copyUrls
+- gradle launch4j
+- gradle msi create msi installer for architecture 32bit
+- gradle msi64 create msi installer for architecture 64bit
+
+

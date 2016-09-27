@@ -206,7 +206,7 @@ public class BotService {
         this.data.save(this.listData);
         this.finallyThreads.run();
 
-        LogsController.success(String.format(this.bundle.getString("robot.log.data_saved"), keyword));
+
         BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.job_finished"), keyword));
         LogsController.success(String.format(this.bundle.getString("robot.log.job_finished"), keyword));
     }

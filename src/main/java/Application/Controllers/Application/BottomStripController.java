@@ -1,15 +1,13 @@
 package Application.Controllers.Application;
 
-import Application.Stages.Loader;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import java.net.URL;
 import javafx.fxml.FXML;
+import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-
-import java.net.URL;
-import java.util.ResourceBundle;
+import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Created by IntelliJ IDEA.

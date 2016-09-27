@@ -1,22 +1,20 @@
 package Application.Controllers.Application;
 
 import java.net.URL;
-
-import Application.Services.Application.BotService;
-import Modules.Bots.First.Controllers.FirstBotControllers;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.application.Platform;
 import javafx.scene.control.TextField;
-import Application.Contracts.Bots.IBotController;
+import javafx.beans.property.StringProperty;
 import Application.Contracts.Data.IDataService;
-import Modules.Data.File.Services.FileDataService;
+import Application.Contracts.Bots.IBotController;
+import javafx.beans.property.SimpleStringProperty;
+import Application.Services.Application.BotService;
 import Application.Contracts.SearchEngines.ISearchEngine;
+import Modules.Bots.First.Controllers.FirstBotControllers;
 import Modules.SearchEngines.Google.Services.GoogleSearchEngineService;
 
 /**
@@ -102,7 +100,7 @@ public class BotController implements Initializable {
     @FXML
     public void analyze(){
 
-        this.data = this.botService.getProviderDataService();
+        this.data = this.botService.getProviderDataService(this.bundle);
         this.bot = new FirstBotControllers(this.searchEngine, this.data, ()->{
             analyze.setDisable(false);
             stop.setDisable(true);

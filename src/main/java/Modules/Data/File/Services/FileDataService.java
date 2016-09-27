@@ -3,9 +3,9 @@ package Modules.Data.File.Services;
 import Application.Contracts.Data.IDataModel;
 import Application.Contracts.Data.IDataService;
 import Application.Controllers.Application.BotController;
+import Application.Controllers.Application.LogsController;
 import Modules.Data.File.Models.Data;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +34,18 @@ public class FileDataService implements IDataService {
     /** @var text file */
     private static final String TEXT_FILE = "data.txt";
 
+    /** @var bundle resource */
+    private ResourceBundle bundle;
+
+    /**
+     * Constructor
+     *
+     * @param bundle
+     */
+    public FileDataService(ResourceBundle bundle){
+        this.bundle = bundle;
+    }
+
     /**
      * Save data with provider
      *
@@ -43,6 +56,9 @@ public class FileDataService implements IDataService {
 
         data = removeDuplicateData(data);
         data = deleteExistData(data);
+
+        if (data.size() <= 0) return;
+        String keywordAll = data.get(0).getKeyword();
 
         PrintWriter out;
         Integer counter = 0;
@@ -67,6 +83,7 @@ public class FileDataService implements IDataService {
             if (out != null){
                 out.close();
             }
+            LogsController.success(String.format(this.bundle.getString("robot.log.data_saved"), keywordAll));
         } catch (IOException e) {
             logger.error("Problem z utworzeniem pliku z pobranymi danymi", e);
         }

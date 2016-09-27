@@ -2,9 +2,26 @@ group "pl.itgolo"
 version "1.0.0"
 def title = "SemStat"
 def iconApp = "/Application/Resources/Assets/Images/Icons/app.png"
+def iconAppIco = "/src/main/java/Application/Resources/Assets/Images/Icons/app.ico"
 def url = "http://www.itgolo.pl"
+def jreMinVersionMustBe = "1.8.0"
+def versionExe = version
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.edu.sc.seis.gradle:launch4j:1.6.2"
+        classpath "gradle.plugin.de.inetsoftware:SetupBuilder:1.8.0"
+    }
+}
 
 apply plugin: "java"
+apply plugin: "edu.sc.seis.launch4j"
+apply plugin: "de.inetsoftware.setupbuilder"
 
 repositories {
     mavenCentral()
@@ -54,3 +71,97 @@ props.setProperty("minimality_urls_in_file_for_long_analyzed", "15")
 props.setProperty("default_robot_limit_sub_site_analyze_domain", "15")
 props.setProperty("user_agent", "Application SemStat ${version} for SEO & SEM. Visit www.itgolo.pl.")
 props.store(file.newWriter(), null)
+
+// Settings for the creation of the output file jar.
+jar {
+    manifest {
+        attributes 'Implementation-Title': title,
+                'Implementation-Version': version,
+                "Main-Class": "Run",
+                "Class-Path": configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
+
+    }
+    baseName = project.name
+}
+
+
+task copyDrivers(type: Copy) {
+    into "$buildDir/libs/drivers"
+    from "$projectDir/drivers"
+}
+
+task copyUrls(type: Copy) {
+    into "$buildDir/libs"
+    from "$projectDir/urls.txt"
+}
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs/lib"
+    from configurations.runtime
+}
+
+// Configuration for launch4j
+launch4j {
+    mainClassName = 'Run'
+    outfile = "${project.name}-${versionExe}.exe"
+    icon = "${project.rootDir}${iconAppIco}"
+    version = versionExe
+    companyName = "ITGolo"
+    productName = "${title}"
+    jreMinVersion = jreMinVersionMustBe
+    copyright = "ITGolo"
+    description = title
+}
+
+setupBuilder {
+    vendor = "ITGolo"
+    application = "${title}"
+    appIdentifier = "${project.name}"
+    description = "This robot get unique domain with website content keyword."
+    icons = "${project.rootDir}${iconAppIco}"
+
+    licenseFile "LICENSE.md"
+    licenseFile {
+        locale = "pl"
+        resource = "LICENSE_PL.md"
+    }
+    licenseFile {
+        locale = "en"
+        resource = "LICENSE.md"
+    }
+    version = versionExe
+
+    //from jar.outputs
+    from("${project.rootDir}/build/libs") {
+        include "**/*.*"
+    }
+
+    bundleJre = 1.8
+    mainClass = "Run"
+    mainJar = "${project.rootDir}/build/libs/${project.name}-${version}.jar"
+
+}
+
+task msi64( type: com.inet.gradle.setup.msi.Msi ) {
+    // setting for 64 bit platform
+}
+msi {
+    arch = "x86"
+    classifier = "x86"
+}
+configure( [msi, msi64] ) {
+
+    languages = ["pl-PL", "en-us"]
+    multiInstanceCount = 100
+    // files only for the Windows platform
+    from("${project.rootDir}/build/launch4j") {
+        include "*.exe"
+    }
+    doFirst {
+        // create a shortcut on Windows platform with placeholder
+        setupBuilder.desktopStarter {
+            displayName = "${title}"
+            executable = "${project.name}-${version}.exe"
+        }
+    }
+}
