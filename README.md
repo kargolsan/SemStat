@@ -1,6 +1,6 @@
 #SemStat for SEO and SEM
 
-![interface_robot](https://cloud.githubusercontent.com/assets/12084504/18873464/e5616752-84bf-11e6-9894-74fe7bcb5d9c.jpg)
+![semstat](https://cloud.githubusercontent.com/assets/12084504/18876316/70449052-84c9-11e6-8359-4ddae7fbb030.jpg)
 
 ## Description
 This robot get unique domain with website content keyword. Interface is for English and Polish languages.
