@@ -1,5 +1,5 @@
 group "pl.itgolo"
-version "1.0.0"
+version "1.0.1"
 def title = "SemStat"
 def iconApp = "/Application/Resources/Assets/Images/Icons/app.png"
 def iconAppIco = "/src/main/java/Application/Resources/Assets/Images/Icons/app.ico"
@@ -70,6 +70,7 @@ props.setProperty("default_google_queries_of_keyword", "1")
 props.setProperty("minimality_urls_in_file_for_long_analyzed", "15")
 props.setProperty("default_robot_limit_sub_site_analyze_domain", "15")
 props.setProperty("user_agent", "Application SemStat ${version} for SEO & SEM. Visit www.itgolo.pl.")
+props.setProperty("default_bot_extensions_domain", ".pl, .com, .net, .info, .eu")
 props.store(file.newWriter(), null)
 
 // Settings for the creation of the output file jar.

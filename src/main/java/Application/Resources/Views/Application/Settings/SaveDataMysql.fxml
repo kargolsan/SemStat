@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox id="root" fx:id="root" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" stylesheets="@../../../Assets/Styles/Application/Settings/SaveDataMysql.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.Application.Settings.SaveDataMysqlController">
+    <children>
+      <HBox alignment="CENTER">
+         <children>
+                  <AnchorPane>
+                     <children>
+                  <HBox spacing="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <VBox alignment="TOP_CENTER">
+                           <children>
+                              <Label text="%tabs.settings.save_data.mysql.connection_string">
+                                 <VBox.margin>
+                                    <Insets bottom="15.0" />
+                                 </VBox.margin>
+                              </Label>
+                                    <GridPane hgap="10.0" vgap="5.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <Label text="%tabs.settings.save_data.mysql.host" GridPane.halignment="RIGHT" />
+                                          <TextField id="host" fx:id="host" GridPane.columnIndex="1" />
+                                          <Label text="%tabs.settings.save_data.mysql.port" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                                          <TextField id="port" fx:id="port" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <TextField id="database" fx:id="database" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                          <Label text="%tabs.settings.save_data.mysql.database" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                                          <TextField id="username" fx:id="username" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                          <Label text="%tabs.settings.save_data.mysql.username" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                                          <Label text="%tabs.settings.save_data.mysql.password" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                                          <PasswordField id="password" fx:id="password" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </GridPane>
+                                    <Button alignment="TOP_LEFT" mnemonicParsing="false" onAction="#test" text="%tabs.settings.save_data.mysql.test">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Button>
+                           </children>
+                        </VBox>
+                              <VBox alignment="TOP_CENTER">
+                                 <children>
+                                    <Label text="%tabs.settings.save_data.mysql.table_property">
+                                 <padding>
+                                    <Insets bottom="15.0" />
+                                 </padding>
+                              </Label>
+                                    <GridPane hgap="10.0" vgap="5.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
+                                       <children>
+                                          <Label text="%tabs.settings.save_data.mysql.table_name" GridPane.halignment="RIGHT" />
+                                          <TextField id="tableName" fx:id="tableName" GridPane.columnIndex="1" />
+                                          <Label text="%tabs.settings.save_data.mysql.column_domain" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                                          <TextField id="columnDomain" fx:id="columnDomain" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                          <TextField id="columnUrl" fx:id="columnUrl" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                          <Label text="%tabs.settings.save_data.mysql.column_url" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+                                          <TextField id="columnQuantity" fx:id="columnQuantity" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                          <Label text="%tabs.settings.save_data.mysql.column_quantity" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                                          <Label text="%tabs.settings.save_data.mysql.column_date" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+                                          <Label text="%tabs.settings.save_data.mysql.column_keyword" GridPane.halignment="RIGHT" GridPane.rowIndex="5" />
+                                          <TextField id="columnDate" fx:id="columnDate" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                          <TextField id="columnKeyword" fx:id="columnKeyword" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                       </children>
+                                       <padding>
+                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                       </padding>
+                                    </GridPane>
+                                 </children>
+                              </VBox>
+                     </children>
+                  </HBox>
+                     </children>
+                  </AnchorPane>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </HBox>
+    </children>
+</VBox>

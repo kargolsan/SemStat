@@ -1,7 +1,7 @@
 package Modules.Bots.First.Controllers;
 
 import Application.Contracts.Bots.IBotController;
-import Application.Contracts.Data.IDataService;
+import Application.Contracts.Data.ISaveService;
 import Application.Contracts.SearchEngines.ISearchEngine;
 import Application.Controllers.Application.BottomStripController;
 import Application.Services.AsyncService;
@@ -26,27 +26,27 @@ public class FirstBotControllers implements IBotController {
     /**
      * Constructor
      *
-     * @param searchEngine
      * @param data
      * @param finallyThreads
      * @param bundle
      */
-    public FirstBotControllers(ISearchEngine searchEngine, IDataService data, Runnable finallyThreads, ResourceBundle bundle){
+    public FirstBotControllers(ISaveService data, Runnable finallyThreads, ResourceBundle bundle){
         this.bundle = bundle;
-        this.bot = new BotService(searchEngine, data, finallyThreads, bundle);
+        this.bot = new BotService(data, finallyThreads, bundle);
     }
 
     /**
      * Rub robot
      *
      * @param keyword
+     * @param filtrExtensionsDomain
      */
     @Override
-    public void start(String keyword) {
+    public void start(String keyword, String filtrExtensionsDomain) {
         BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.bot_running")));
 
         new AsyncService().single(() -> {
-            this.bot.start(keyword);
+            this.bot.start(keyword, filtrExtensionsDomain);
         });
     }
 

@@ -1,30 +1,13 @@
 package Application.Controllers.Application;
 
-import Application.Contracts.Bots.IBotController;
-import Application.Contracts.Data.IDataModel;
-import Application.Contracts.Data.IDataService;
-import Application.Contracts.SearchEngines.ISearchEngine;
-import Modules.Bots.First.Controllers.FirstBotControllers;
-import Modules.Bots.First.Services.AnalyzeLong;
-import Modules.Data.File.Services.FileDataService;
-import Modules.SearchEngines.Google.Services.GoogleSearchEngineService;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**

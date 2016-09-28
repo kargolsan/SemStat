@@ -1,7 +1,7 @@
 package Modules.Data.File.Services;
 
-import Application.Contracts.Data.IDataModel;
-import Application.Contracts.Data.IDataService;
+import Application.Contracts.Data.IResultModel;
+import Application.Contracts.Data.ISaveService;
 import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.LogsController;
 import Modules.Data.File.Models.Data;
@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
  * Date: 23.09.2016
  * Time: 19:17
  */
-public class FileDataService implements IDataService {
+public class FileDataService implements ISaveService {
 
     /** @var logger */
     private static final Logger logger = LogManager.getLogger(FileDataService.class);
@@ -52,7 +52,7 @@ public class FileDataService implements IDataService {
      * @param data
      */
     @Override
-    public void save(List<IDataModel> data) {
+    public void save(List<IResultModel> data) {
 
         data = removeDuplicateData(data);
         data = deleteExistData(data);
@@ -66,7 +66,7 @@ public class FileDataService implements IDataService {
             createDirectory(DIR);
 
             out = new PrintWriter(new FileOutputStream(new File(DIR + "\\" +TEXT_FILE), true));
-            for (IDataModel s : data){
+            for (IResultModel s : data){
 
                 String domain = s.getDomain();
                 String url = s.getUrl();
@@ -78,7 +78,7 @@ public class FileDataService implements IDataService {
                         domain, url, quantity, date, keyword));
 
                 counter++;
-                BotController.setSavedUniqueDomainsProperty(counter.toString());
+                BotController.setCountUnique(counter.toString());
             }
             if (out != null){
                 out.close();
@@ -95,21 +95,21 @@ public class FileDataService implements IDataService {
      * @param data
      * @return
      */
-    public List<IDataModel> deleteExistData(List<IDataModel> data) {
+    public List<IResultModel> deleteExistData(List<IResultModel> data) {
 
-        List<IDataModel> fromFile = new ArrayList<IDataModel>();
-        List<IDataModel> uniqueData = new ArrayList<IDataModel>();
+        List<IResultModel> fromFile = new ArrayList<IResultModel>();
+        List<IResultModel> uniqueData = new ArrayList<IResultModel>();
 
         fromFile.addAll(getDataFromFile());
 
-        for (IDataModel dt : data){
+        for (IResultModel dt : data){
 
             String domainData = dt.getDomain();
             String keywordData = dt.getKeyword();
 
             Boolean add = true;
 
-            for (IDataModel df : fromFile){
+            for (IResultModel df : fromFile){
 
                 String domainInFile = df.getDomain();
                 String keywordInFile = df.getKeyword();
@@ -140,8 +140,8 @@ public class FileDataService implements IDataService {
     /**
      * Set data before save
      */
-    public List<IDataModel> getDataFromFile(){
-        List<IDataModel> dataFromFile = new ArrayList<IDataModel>();
+    public List<IResultModel> getDataFromFile(){
+        List<IResultModel> dataFromFile = new ArrayList<IResultModel>();
 
         BufferedReader br = null;
         try {
@@ -153,7 +153,7 @@ public class FileDataService implements IDataService {
             br = new BufferedReader(new FileReader(DIR + "\\" + TEXT_FILE));
             while ((sCurrentLine = br.readLine()) != null) {
                 ObjectMapper mapper = new ObjectMapper();
-                IDataModel data = mapper.readValue(sCurrentLine, Data.class);
+                IResultModel data = mapper.readValue(sCurrentLine, Data.class);
                 dataFromFile.add(data);
             }
         } catch (IOException e) {
@@ -174,22 +174,22 @@ public class FileDataService implements IDataService {
      * @param data
      * @return items
      */
-    private List<IDataModel> removeDuplicateData(List<IDataModel>  data){
+    private List<IResultModel> removeDuplicateData(List<IResultModel>  data){
 
-        List<IDataModel> uniqueList = new ArrayList<IDataModel>();
+        List<IResultModel> uniqueList = new ArrayList<IResultModel>();
 
         if (data.size() > 0){
             uniqueList.add(data.get(0));
         }
 
-        for (IDataModel dt : data){
+        for (IResultModel dt : data){
 
             String domainData = dt.getDomain();
             String keywordData = dt.getKeyword();
 
             Boolean has = false;
 
-            for (IDataModel du : uniqueList){
+            for (IResultModel du : uniqueList){
 
                 String domainUnique = du.getDomain();
                 String keywordUnique = du.getKeyword();

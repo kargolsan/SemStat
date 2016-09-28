@@ -1,24 +1,14 @@
 package Modules.Data.MySQL.Services;
 
-import Application.Contracts.Data.IDataModel;
-import Application.Contracts.Data.IDataService;
+import Application.Contracts.Data.IResultModel;
+import Application.Contracts.Data.ISaveService;
 import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.LogsController;
-import Application.Services.AlertService;
 import Application.Services.Application.SettingsService;
-import Modules.Data.File.Models.Data;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
 
 /**
@@ -27,7 +17,7 @@ import java.util.*;
  * Date: 23.09.2016
  * Time: 19:17
  */
-public class MySQLDataService implements IDataService {
+public class MySQLDataService implements ISaveService {
 
     /**
      * @var logger
@@ -70,7 +60,7 @@ public class MySQLDataService implements IDataService {
      * @param data
      */
     @Override
-    public void save(List<IDataModel> data) {
+    public void save(List<IResultModel> data) {
 
         data = removeDuplicateData(data);
 
@@ -93,11 +83,11 @@ public class MySQLDataService implements IDataService {
 
             conn = DriverManager.getConnection(connectionString, this.username, this.password);
 
-            for (IDataModel item : data) {
+            for (IResultModel item : data) {
                 if (checkExistData(item, conn)) continue;
                 addDataToDatabase(item, conn);
                 counter++;
-                BotController.setSavedUniqueDomainsProperty(counter.toString());
+                BotController.setCountUnique(counter.toString());
             }
 
             LogsController.success(String.format(this.bundle.getString("robot.log.data_saved"), keywordAll));
@@ -126,22 +116,22 @@ public class MySQLDataService implements IDataService {
      * @param data
      * @return items
      */
-    private List<IDataModel> removeDuplicateData(List<IDataModel> data) {
+    private List<IResultModel> removeDuplicateData(List<IResultModel> data) {
 
-        List<IDataModel> uniqueList = new ArrayList<IDataModel>();
+        List<IResultModel> uniqueList = new ArrayList<IResultModel>();
 
         if (data.size() > 0) {
             uniqueList.add(data.get(0));
         }
 
-        for (IDataModel dt : data) {
+        for (IResultModel dt : data) {
 
             String domainData = dt.getDomain();
             String keywordData = dt.getKeyword();
 
             Boolean has = false;
 
-            for (IDataModel du : uniqueList) {
+            for (IResultModel du : uniqueList) {
 
                 String domainUnique = du.getDomain();
                 String keywordUnique = du.getKeyword();
@@ -184,7 +174,7 @@ public class MySQLDataService implements IDataService {
      * @return true if exist or false if not exist
      * @throws SQLException
      */
-    private Boolean checkExistData(IDataModel data, Connection conn) throws SQLException {
+    private Boolean checkExistData(IResultModel data, Connection conn) throws SQLException {
 
         String queryCheck = String.format("SELECT count(*) from %1$s WHERE %2$s = ? AND %3$s = ?", this.tableName, this.columnDomain, this.columnKeyword);
 
@@ -209,7 +199,7 @@ public class MySQLDataService implements IDataService {
      * @param conn
      * @throws SQLException
      */
-    private void addDataToDatabase(IDataModel data, Connection conn) throws SQLException {
+    private void addDataToDatabase(IResultModel data, Connection conn) throws SQLException {
         String query = String.format(" insert into %1$s (%2$s, %3$s, %4$s, %5$s, %6$s)"
                 + " values (?, ?, ?, ?, ?)", this.tableName, this.columnDomain, this.columnUrl, this.columnQuantity, this.columnDate, this.columnKeyword);
 

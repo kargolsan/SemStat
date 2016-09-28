@@ -1,6 +1,9 @@
 package Application.Controllers.Application;
 
 import java.net.URL;
+
+import Application.Services.Application.SettingsService;
+import Application.Services.PropertyService;
 import javafx.fxml.FXML;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
@@ -9,11 +12,10 @@ import javafx.scene.control.Button;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.beans.property.StringProperty;
-import Application.Contracts.Data.IDataService;
+import Application.Contracts.Data.ISaveService;
 import Application.Contracts.Bots.IBotController;
 import javafx.beans.property.SimpleStringProperty;
 import Application.Services.Application.BotService;
-import Application.Contracts.SearchEngines.ISearchEngine;
 import Modules.Bots.First.Controllers.FirstBotControllers;
 import Modules.SearchEngines.Google.Services.GoogleSearchEngineService;
 
@@ -27,51 +29,39 @@ public class BotController implements Initializable {
 
     @FXML
     private TextField keyword;
-
+    @FXML
+    private TextField extensionsDomain;
     @FXML
     private Button analyze;
-
     @FXML
     private Button stop;
-
     @FXML
-    private Label quantityWebsitesWithKeyword;
-
+    private Label countFound;
     @FXML
-    private Label savedUniqueDomains;
-
+    private Label countUnique;
     @FXML
-    private Label analyzedWebsites;
+    private Label countAnalyzed;
 
-    /** @var bot service application */
+    /* @var bot service application */
     private BotService botService;
 
-//    @FXML
-//    private Label urlsToAnalyze;
+    /* @var property count found */
+    private static StringProperty countFoundProperty = new SimpleStringProperty();
 
-    /** @var property information */
-    private static StringProperty quantityWebsitesWithKeywordProperty = new SimpleStringProperty();
+    /* @var property count unique */
+    private static StringProperty countUniqueProperty = new SimpleStringProperty();
 
-    /** @var property information */
-    private static StringProperty savedUniqueDomainsProperty = new SimpleStringProperty();
+    /* @var property count analyzed */
+    private static StringProperty countAnalyzedProperty = new SimpleStringProperty();
 
-    /** @var property information */
-    private static StringProperty analyzedWebsitesProperty = new SimpleStringProperty();
-
-    /** @var property information */
-//    private static StringProperty urlsToAnalyzeProperty = new SimpleStringProperty();
-
-    /** @var bundle resource */
+    /* @var bundle resource */
     private ResourceBundle bundle;
 
-    /** @var robot */
+    /* @var file with properties of application */
+    private static final String PROPERTIES_FILE = "Application/Resources/properties.properties";
+
+    /* @var bot */
     IBotController bot;
-
-    /** @var pre search */
-    ISearchEngine searchEngine;
-
-    /** @var data service for ready and save analyzed data */
-    IDataService data;
 
     /**
      * Called to initialize a controller after its root element has been
@@ -80,15 +70,15 @@ public class BotController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle bundle) {
         this.bundle = bundle;
-
         this.botService = new BotService(bundle);
 
-        this.quantityWebsitesWithKeyword.textProperty().bind(quantityWebsitesWithKeywordProperty);
-        this.savedUniqueDomains.textProperty().bind(savedUniqueDomainsProperty);
-        this.analyzedWebsites.textProperty().bind(analyzedWebsitesProperty);
-        //this.urlsToAnalyze.textProperty().bind(urlsToAnalyzeProperty);
+        this.countFound.textProperty().bind(countFoundProperty);
+        this.countUnique.textProperty().bind(countUniqueProperty);
+        this.countAnalyzed.textProperty().bind(countAnalyzedProperty);
 
-        this.searchEngine = new GoogleSearchEngineService();
+        fillInterface();
+
+        resetDisplayResults();
 
         BottomStripController.setStatus(this.bundle.getString("robot.status.ready_to_job"));
     }
@@ -100,26 +90,20 @@ public class BotController implements Initializable {
     @FXML
     public void analyze(){
 
-        this.data = this.botService.getProviderDataService(this.bundle);
-        this.bot = new FirstBotControllers(this.searchEngine, this.data, ()->{
-            analyze.setDisable(false);
-            stop.setDisable(true);
-        }, bundle);
-
-        setAnalyzedWebsitesProperty("0");
-        setQuantityWebsitesWithKeywordProperty("0");
-        setSavedUniqueDomainsProperty("0");
-        //setUrlsToAnalyzeProperty("0");
-
         String keyword = this.keyword.getText();
+
+        this.bot = buildBot();
+
+        resetDisplayResults();
+
+        if (keyword =="") LogsController.warning(this.bundle.getString("robot.log.empty_keyword_field_in_interface"));
+
+        LogsController.info(String.format(this.bundle.getString("robot.log.start_analyze_keyword"), keyword));
 
         this.analyze.setDisable(true);
         this.stop.setDisable(false);
 
-        if (keyword =="") LogsController.warning(this.bundle.getString("robot.log.empty_keyword_field_in_interface"));
-        LogsController.info(String.format(this.bundle.getString("robot.log.start_analyze_keyword"), keyword));
-
-        this.bot.start(keyword);
+        this.bot.start(keyword, this.extensionsDomain.getText());
     }
 
     /**
@@ -131,41 +115,70 @@ public class BotController implements Initializable {
     }
 
     /**
-     * Set information in interface
+     * Set found websites
      *
-     * @param quantityWebsitesWithKeywordProperty
+     * @param value
      */
-    public static void setQuantityWebsitesWithKeywordProperty(String quantityWebsitesWithKeywordProperty) {
+    public static void setCountFound(String value) {
         Platform.runLater(()->{
-            BotController.quantityWebsitesWithKeywordProperty.set(quantityWebsitesWithKeywordProperty);
+            BotController.countFoundProperty.set(value);
         });
     }
 
     /**
-     * Set information in interface
+     * Set count unique domains
      *
-     * @param savedUniqueDomainsProperty
+     * @param value
      */
-    public static void setSavedUniqueDomainsProperty(String savedUniqueDomainsProperty) {
+    public static void setCountUnique(String value) {
         Platform.runLater(()->{
-            BotController.savedUniqueDomainsProperty.set(savedUniqueDomainsProperty);
+            BotController.countUniqueProperty.set(value);
         });
     }
 
     /**
-     * Set information in interface
+     * Set count analyzed websites
      *
-     * @param analyzedWebsitesProperty
+     * @param value
      */
-    public static void setAnalyzedWebsitesProperty(String analyzedWebsitesProperty) {
+    public static void setCountAnalyzed(String value) {
         Platform.runLater(()->{
-            BotController.analyzedWebsitesProperty.set(analyzedWebsitesProperty);
+            BotController.countAnalyzedProperty.set(value);
         });
     }
 
-//    public static void setUrlsToAnalyzeProperty(String urlsToAnalyzeProperty) {
-//        Platform.runLater(()->{
-//            BotController.urlsToAnalyzeProperty.set(urlsToAnalyzeProperty);
-//        });
-//    }
+    /**
+     * Build bot
+     *
+     * @return bot controller
+     */
+    private IBotController buildBot(){
+        ISaveService saveService = this.botService.getProviderDataService(this.bundle);
+        return new FirstBotControllers(saveService, ()->{
+            analyze.setDisable(false);
+            stop.setDisable(true);
+        }, bundle);
+    }
+
+    /**
+     * Reset display results of bot
+     */
+    private void resetDisplayResults(){
+        setCountAnalyzed("0");
+        setCountFound("0");
+        setCountUnique("0");
+    }
+
+    /**
+     * Fill fields in interface
+     */
+    private void fillInterface(){
+        String defaultBED = PropertyService.get("default_bot_extensions_domain", PROPERTIES_FILE);
+
+        String getBED = SettingsService.get("bot.general.extensions.domain");
+
+        getBED = (getBED == "") ? defaultBED : getBED;
+
+        this.extensionsDomain.setText(getBED);
+    }
 }

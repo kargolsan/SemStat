@@ -1,15 +1,9 @@
 package Modules.Bots.First.Services;
 
-import Application.Contracts.Data.IDataModel;
-import Application.Contracts.SearchEngines.IResultModel;
-import Application.Controllers.Application.BotController;
+import Application.Contracts.Data.IResultModel;
 import Application.Controllers.Application.BottomStripController;
 import Application.Controllers.Application.LogsController;
 import Application.Services.PropertyService;
-import Modules.Data.File.Models.Data;
-import Modules.Data.File.Services.FileDataService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -19,12 +13,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,20 +22,18 @@ import java.util.regex.Pattern;
  * Date: 26.09.2016
  * Time: 13:37
  */
-public class AnalyzeLong {
+public class AnalyzeBotLong {
 
     /** @var logger */
-    private static final Logger logger = LogManager.getLogger(AnalyzeLong.class);
+    private static final Logger logger = LogManager.getLogger(AnalyzeBotLong.class);
 
-    /**
-     * @var resource bundle
-     */
+    /* @var resource bundle*/
     private ResourceBundle bundle;
 
-    /** @var bot service */
+    /* @var bot service */
     private BotService bot;
 
-    /** @var text file with urls */
+    /* @var text file with urls */
     private static final String TEXT_FILE = "urls.txt";
 
     /**
@@ -53,7 +41,7 @@ public class AnalyzeLong {
      *
      * @param bot
      */
-    public AnalyzeLong(BotService bot, ResourceBundle bundle){
+    public AnalyzeBotLong(BotService bot, ResourceBundle bundle){
         this.bot = bot;
         this.bundle = bundle;
     }
@@ -66,6 +54,8 @@ public class AnalyzeLong {
      */
     public void start(ExecutorService executor, String keyword) {
 
+        // blokada dodawania linków do wyników jeżeli domena istnieje w linkach wstępnych
+
         List<String> urlsToAnalyzed = new ArrayList<>();
 
         if (this.bot.isInterrupted()) return;
@@ -73,7 +63,7 @@ public class AnalyzeLong {
         String userAgent = PropertyService.get("user_agent", "Application/Resources/properties.properties");
 
         urlsToAnalyzed.addAll(addDomainsFromFile(keyword));
-        urlsToAnalyzed.addAll(this.bot.getUrlsToAnalyze());
+        urlsToAnalyzed.addAll(this.bot.getParseService().getUrlsToAnalyze());
 
         if (urlsToAnalyzed.size() < getMinimalityUrls()){
             LogsController.error(String.format(this.bundle.getString("robot.log.require_minimality_fifteen_urls_for_long_analyzed"), getMinimalityUrls()));
@@ -85,31 +75,22 @@ public class AnalyzeLong {
             String url = urlsToAnalyzed.get(0);
             urlsToAnalyzed.remove(0);
 
-//            Integer counterUrlsToAnalyze = this.bot.getUrlsToAnalyze().size()+ urlsToAnalyzed.size();
-//            if (counterUrlsToAnalyze > 0) {
-//                BotController.setUrlsToAnalyzeProperty(Objects.toString(counterUrlsToAnalyze));
-//            }
-
             if (this.bot.isInterrupted()) return;
 
             executor.execute(() -> {
 
                 if (this.bot.isInterrupted()) return;
 
+                String ads = "?utm_source=http://fb.me/itgolo&utm_medium=itgolo&utm_term=Program%20SemStat%20SEO%20i%20SEM%20http://fb.me/itgolo";
+
                 try {
-                    Document doc = Jsoup.connect(url).userAgent(userAgent).get();
+                    Document doc = Jsoup.connect(url + ads).userAgent(userAgent).get();
 
                     BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.analyzing_website"), doc.baseUri()));
 
-                    IDataModel data = this.bot.docToDataModel(doc, keyword);
+                    this.bot.getParseService().htmlToResult(doc, keyword);
 
-                    if (data != null){
-                        this.bot.addToListData(data);
-                    }
-
-                    List<String> urls = this.bot.docToUrls(doc);
-
-                    this.bot.addUrlsForAnalyze(urls);
+                    this.bot.getParseService().htmlToLinks(doc);
 
                 } catch (Exception e) { }
 
@@ -122,8 +103,8 @@ public class AnalyzeLong {
                     e.printStackTrace();
                 }
 
-                urlsToAnalyzed.addAll(this.bot.getUrlsToAnalyze());
-                this.bot.getUrlsToAnalyze().clear();
+                urlsToAnalyzed.addAll(this.bot.getParseService().getUrlsToAnalyze());
+                this.bot.getParseService().getUrlsToAnalyze().clear();
 
             }
 
@@ -159,7 +140,7 @@ public class AnalyzeLong {
                 urls.add(sCurrentLine);
             }
 
-            this.bot.addUrlsForAnalyze(urls);
+            this.bot.getParseService().addLinksForAnalyze(urls);
         } catch (IOException e) {
             logger.error("Błąd podczas odczytywania danych z pliku urls.txt", e);
         } finally {

@@ -12,8 +12,9 @@ public interface IBotController {
      * Rub robot
      *
      * @param keyword
+     * @param filtrExtensionsDomain
      */
-    void start(String keyword);
+    void start(String keyword, String filtrExtensionsDomain);
 
     /**
      * Interrupt robot

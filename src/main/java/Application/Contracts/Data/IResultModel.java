@@ -8,7 +8,7 @@ import java.util.Calendar;
  * Date: 23.09.2016
  * Time: 19:15
  */
-public interface IDataModel {
+public interface IResultModel {
     void setDomain(String domain);
 
     void setUrl(String url);

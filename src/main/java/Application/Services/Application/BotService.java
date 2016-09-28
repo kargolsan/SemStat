@@ -1,6 +1,6 @@
 package Application.Services.Application;
 
-import Application.Contracts.Data.IDataService;
+import Application.Contracts.Data.ISaveService;
 import Modules.Data.File.Services.FileDataService;
 import Modules.Data.MySQL.Services.MySQLDataService;
 
@@ -32,11 +32,11 @@ public class BotService {
      * @param bundle
      * @return
      */
-    public IDataService getProviderDataService(ResourceBundle bundle){
+    public ISaveService getProviderDataService(ResourceBundle bundle){
         String currentOpt = SettingsService.get("robot.save_option");
 
-        String optToFile = this.bundle.getString("tabs.settings.bot.save_option.to_file");
-        String optToMySQL = this.bundle.getString("tabs.settings.bot.save_option.to_mysql");
+        String optToFile = this.bundle.getString("tabs.settings.bot.general.save_option.to_file");
+        String optToMySQL = this.bundle.getString("tabs.settings.bot.general.save_option.to_mysql");
 
         if (currentOpt.equals(optToFile)) {
             return new FileDataService(bundle);

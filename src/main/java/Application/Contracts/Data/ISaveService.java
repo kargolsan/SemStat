@@ -8,12 +8,12 @@ import java.util.List;
  * Date: 23.09.2016
  * Time: 19:12
  */
-public interface IDataService {
+public interface ISaveService {
 
     /**
      * Save data with provider
      *
      * @param data
      */
-    void save(List<IDataModel> data);
+    void save(List<IResultModel> data);
 }

@@ -1,20 +1,16 @@
 package Application.Controllers.Application;
 
 import java.net.URL;
-import java.sql.*;
-import java.util.ResourceBundle;
-import java.util.TimeZone;
-
-import Application.Services.AlertService;
-import Application.Services.Application.SettingsService;
-import Application.Services.PropertyService;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.AnchorPane;
+import Application.Services.AlertService;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import Application.Controllers.Application.Settings.*;
+import javafx.scene.layout.HBox;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,225 +21,171 @@ import javafx.scene.control.TextField;
 public class SettingsController implements Initializable {
 
     @FXML
-    private TextField googleApiKey;
-
+    private HBox container;
     @FXML
-    private TextField googleSearchEngineId;
-
+    private TitledPane title;
     @FXML
-    private TextField queriesOfKeyword;
-
+    private DefaultController defaultController;
     @FXML
-    private TextField processorLimitThreads;
-
+    private ApisGoogleController apisGoogleController;
     @FXML
-    private TextField robotLimitSubSiteAnalyzeDomain;
-
+    private ApisYahooController apisYahooController;
     @FXML
-    private TextField mysqlHost;
-
+    private BotGeneralController botGeneralController;
     @FXML
-    private TextField mysqlPort;
-
+    private ProcessorGeneralController processorGeneralController;
     @FXML
-    private TextField mysqlDatabase;
-
+    private SaveDataFileController saveDataFileController;
     @FXML
-    private TextField mysqlUsername;
+    private SaveDataMysqlController saveDataMysqlController;
 
-    @FXML
-    private PasswordField mysqlPassword;
-
-    @FXML
-    private TextField mysqlTableName;
-
-    @FXML
-    private TextField mysqlColumnDomain;
-
-    @FXML
-    private TextField mysqlColumnUrl;
-
-    @FXML
-    private TextField mysqlColumnQuantity;
-
-    @FXML
-    private TextField mysqlColumnDate;
-
-    @FXML
-    private TextField mysqlColumnKeyword;
-
-    @FXML
-    private ComboBox<String> robotSaveDataTo;
-
-    /** Observable list for robot save option */
-    public ObservableList<String> optionsRobotSaveTo;
-
-    /** @var bundle */
-    private ResourceBundle bundle;
-
-    /** @var file with properties of application */
-    private static final String PROPERTIES_FILE = "Application/Resources/properties.properties";
+    /** @vars visible roots */
+    private BooleanProperty visibleDefault = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleApisGoogle = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleApisYahoo = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleBotGeneral = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleProcessorGeneral = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleSaveDataFile = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleSaveDataMysql = new SimpleBooleanProperty(false);
 
     /**
-     * Constructor
+     * @var bundle
      */
-    public SettingsController(){
-        this.optionsRobotSaveTo = FXCollections.observableArrayList();
-    }
+    private ResourceBundle bundle;
+
+    /**
+     * @var file with properties of application
+     */
+    private static final String PROPERTIES_FILE = "Application/Resources/properties.properties";
 
     /**
      * Called to initialize a controller after its root element has been
      * completely processed.
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        this.bundle = resources;
+    public void initialize(URL location, ResourceBundle bundle) {
+        this.bundle = bundle;
 
-        this.optionsRobotSaveTo.add(resources.getString("tabs.settings.bot.save_option.to_file"));
-        this.optionsRobotSaveTo.add(resources.getString("tabs.settings.bot.save_option.to_mysql"));
-        this.robotSaveDataTo.setItems(this.optionsRobotSaveTo);
+        loadVisibleRoots();
 
-        fillInterface();
+        loadVisibleDefaultRoot();
+    }
+
+    /**
+     * Show root
+     */
+    @FXML
+    public void apisGoogle(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.apis.google"));
+        this.visibleApisGoogle.set(true);
+    }
+
+    /**
+     * Show root
+     */
+    @FXML
+    public void apisYahoo(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.apis.yahoo"));
+        this.visibleApisYahoo.set(true);
+    }
+
+    /**
+     * Show root
+     */
+    @FXML
+    public void botGeneral(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.bot.general"));
+        this.visibleBotGeneral.set(true);
+    }
+
+    /**
+     * Show root
+     */
+    @FXML
+    public void processorGeneral(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.processor.general"));
+        this.visibleProcessorGeneral.set(true);
+    }
+
+    /**
+     * Show root
+     */
+    @FXML
+    public void saveDataFile(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.save_data.file"));
+        this.visibleSaveDataFile.set(true);
+    }
+
+    /**
+     * Show root
+     */
+    @FXML
+    public void saveDataMysql(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.save_data.mysql"));
+        this.visibleSaveDataMysql.set(true);
     }
 
     /**
      * Save all settings
      */
     @FXML
-    public void save(){
-        SettingsService.add("google.api_key", this.googleApiKey.getText());
-        SettingsService.add("google.search_engine_id", this.googleSearchEngineId.getText());
-        SettingsService.add("google.queries_of_keyword", this.queriesOfKeyword.getText());
-        SettingsService.add("processor.limit_threads", this.processorLimitThreads.getText());
-        SettingsService.add("robot.limit_sub_site_analyze_domain", this.robotLimitSubSiteAnalyzeDomain.getText());
-        SettingsService.add("robot.save_option", this.robotSaveDataTo.getSelectionModel().getSelectedItem().toString());
-
-        SettingsService.add("mysql.host", this.mysqlHost.getText());
-        SettingsService.add("mysql.port", this.mysqlPort.getText());
-        SettingsService.add("mysql.database", this.mysqlDatabase.getText());
-        SettingsService.add("mysql.username", this.mysqlUsername.getText());
-        SettingsService.add("mysql.password", this.mysqlPassword.getText());
-        SettingsService.add("mysql.table.name", this.mysqlTableName.getText());
-        SettingsService.add("mysql.table.column_domain", this.mysqlColumnDomain.getText());
-        SettingsService.add("mysql.table.column_url", this.mysqlColumnUrl.getText());
-        SettingsService.add("mysql.table.column_quantity", this.mysqlColumnQuantity.getText());
-        SettingsService.add("mysql.table.column_date", this.mysqlColumnDate.getText());
-        SettingsService.add("mysql.table.column_keyword", this.mysqlColumnKeyword.getText());
+    public void save() {
+        this.apisGoogleController.save();
+        this.apisYahooController.save();
+        this.botGeneralController.save();
+        this.processorGeneralController.save();
+        this.saveDataFileController.save();
+        this.saveDataMysqlController.save();
 
         LogsController.success(this.bundle.getString("tabs.settings.setting_saved"));
         AlertService.info(this.bundle.getString("dialog_alert.information"), null, this.bundle.getString("tabs.settings.setting_saved"));
     }
 
     /**
-     * Fill controls in interface
-     * (for load application)
+     * Set visible for roots in container
      */
-    private void fillInterface(){
-        String defaultPLT = PropertyService.get("default_processor_limit_threads", PROPERTIES_FILE);
-        String defaultGQK = PropertyService.get("default_google_queries_of_keyword", PROPERTIES_FILE);
-        String defaultRLS = PropertyService.get("default_robot_limit_sub_site_analyze_domain", PROPERTIES_FILE);
+    private void loadVisibleRoots(){
+        this.defaultController.getRoot().visibleProperty().bind(this.visibleDefault);
+        this.apisGoogleController.getRoot().visibleProperty().bind(this.visibleApisGoogle);
+        this.apisYahooController.getRoot().visibleProperty().bind(this.visibleApisYahoo);
+        this.botGeneralController.getRoot().visibleProperty().bind(this.visibleBotGeneral);
+        this.processorGeneralController.getRoot().visibleProperty().bind(this.visibleProcessorGeneral);
+        this.saveDataFileController.getRoot().visibleProperty().bind(this.visibleSaveDataFile);
+        this.saveDataMysqlController.getRoot().visibleProperty().bind(this.visibleSaveDataMysql);
 
-        String getGAK = SettingsService.get("google.api_key");
-        String getGSE = SettingsService.get("google.search_engine_id");
-        String getGQK = SettingsService.get("google.queries_of_keyword");
-        String getPLT = SettingsService.get("processor.limit_threads");
-        String getRLS = SettingsService.get("robot.limit_sub_site_analyze_domain");
-        String getRSO = SettingsService.get("robot.save_option");
-
-        getPLT = (getPLT == "") ? defaultPLT : getPLT;
-        getGQK = (getGQK == "") ? defaultGQK : getGQK;
-        getRLS = (getRLS == "") ? defaultRLS : getRLS;
-        getRSO = (getRSO == "") ? this.bundle.getString("tabs.settings.bot.save_option.to_file") : getRSO;
-
-        this.googleApiKey.setText(getGAK);
-        this.googleSearchEngineId.setText(getGSE);
-        this.queriesOfKeyword.setText(getGQK);
-        this.processorLimitThreads.setText(getPLT);
-        this.robotLimitSubSiteAnalyzeDomain.setText(getRLS);
-        this.robotSaveDataTo.getSelectionModel().select(getRSO);
-
-        this.mysqlHost.setText(SettingsService.get("mysql.host"));
-        this.mysqlPort.setText(SettingsService.get("mysql.port"));
-        this.mysqlDatabase.setText(SettingsService.get("mysql.database"));
-        this.mysqlUsername.setText(SettingsService.get("mysql.username"));
-        this.mysqlPassword.setText(SettingsService.get("mysql.password"));
-        this.mysqlTableName.setText(SettingsService.get("mysql.table.name"));
-        this.mysqlColumnDomain.setText(SettingsService.get("mysql.table.column_domain"));
-        this.mysqlColumnUrl.setText(SettingsService.get("mysql.table.column_url"));
-        this.mysqlColumnQuantity.setText(SettingsService.get("mysql.table.column_quantity"));
-        this.mysqlColumnDate.setText(SettingsService.get("mysql.table.column_date"));
-        this.mysqlColumnKeyword.setText(SettingsService.get("mysql.table.column_keyword"));
-
+        this.defaultController.getRoot().managedProperty().bind(this.visibleDefault);
+        this.apisGoogleController.getRoot().managedProperty().bind(this.visibleApisGoogle);
+        this.apisYahooController.getRoot().managedProperty().bind(this.visibleApisYahoo);
+        this.botGeneralController.getRoot().managedProperty().bind(this.visibleBotGeneral);
+        this.processorGeneralController.getRoot().managedProperty().bind(this.visibleProcessorGeneral);
+        this.saveDataFileController.getRoot().managedProperty().bind(this.visibleSaveDataFile);
+        this.saveDataMysqlController.getRoot().managedProperty().bind(this.visibleSaveDataMysql);
     }
 
     /**
-     * Test connection with MySQL
+     * Hide all roots
      */
-    @FXML
-    public void mysqlTest(){
+    private void hideRoots(){
+        this.visibleDefault.set(false);
+        this.visibleApisGoogle.set(false);
+        this.visibleApisYahoo.set(false);
+        this.visibleBotGeneral.set(false);
+        this.visibleProcessorGeneral.set(false);
+        this.visibleSaveDataFile.set(false);
+        this.visibleSaveDataMysql.set(false);
+    }
 
-        String host = this.mysqlHost.getText();
-        String port = this.mysqlPort.getText();
-        String database = this.mysqlDatabase.getText();
-        String username = this.mysqlUsername.getText();
-        String password = this.mysqlPassword.getText();
-        String timezone = TimeZone.getDefault().getID();
-
-        if (host.contains("http://")) host = host.replace("http://", "");
-        if (host.contains("https://")) host = host.replace("https://", "");
-
-        Connection con = null;
-        Statement st = null;
-        ResultSet rs = null;
-
-        String connectionString = String.format("jdbc:mysql://%1$s:%2$s/%3$s?useLegacyDatetimeCode=false&serverTimezone=%4$s", host, port, database, timezone);
-
-        try {
-
-            con = DriverManager.getConnection(connectionString, username, password);
-            st = con.createStatement();
-            rs = st.executeQuery("select * from information_schema.tables");
-            LogsController.success(this.bundle.getString("robot.log.success_test_connection_mysql"));
-            AlertService.info(this.bundle.getString("dialog_alert.information"), null, this.bundle.getString("robot.log.success_test_connection_mysql"));
-
-        } catch (SQLException ex) {
-            LogsController.error(String.format(this.bundle.getString("robot.log.failed_test_connection_mysql"), ex.getMessage()));
-            AlertService.error(this.bundle.getString("dialog_alert.error"), null, this.bundle.getString("robot.log.failed_test_connection_mysql"));
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (st != null) {
-                    st.close();
-                }
-                if (con != null) {
-                    con.close();
-                }
-            } catch (SQLException ex) {}
-        }
-
-//        this.mysqlHost.getText()
-//        SettingsService.get("mysql.host");
-//        this.mysqlPort.getText()
-//        SettingsService.get("mysql.port");
-//        this.mysqlDatabase.getText()
-//        SettingsService.get("mysql.database");
-//        this.mysqlUsername.getText()
-//        SettingsService.get("mysql.username");
-//        this.mysqlPassword.getText()
-//        SettingsService.get("mysql.password");
-//        this.mysqlTableName.getText()
-//        SettingsService.get("mysql.table.name");
-//        this.mysqlColumnDomain.getText()
-//        SettingsService.get("mysql.table.column_domain");
-//        this.mysqlColumnUrl.getText()
-//        SettingsService.get("mysql.table.column_url");
-//        this.mysqlColumnQuantity.getText()
-//        SettingsService.get("mysql.table.column_quantity");
-//        this.mysqlColumnDate.getText()
-//        SettingsService.get("mysql.table.column_date");
-//        this.mysqlColumnKeyword.getText()
-//        SettingsService.get("mysql.table.column_keyword");
+    /**
+     * Load default visible root
+     */
+    private void loadVisibleDefaultRoot(){
+        this.visibleDefault.set(true);
+        this.title.setText(this.bundle.getString("tabs.settings.default.title.settings"));
     }
 }

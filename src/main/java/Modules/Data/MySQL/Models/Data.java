@@ -1,6 +1,6 @@
 package Modules.Data.MySQL.Models;
 
-import Application.Contracts.Data.IDataModel;
+import Application.Contracts.Data.IResultModel;
 
 import java.util.Calendar;
 
@@ -10,7 +10,7 @@ import java.util.Calendar;
  * Date: 23.09.2016
  * Time: 19:18
  */
-public class Data implements IDataModel {
+public class Data implements IResultModel {
 
     private String domain;
 
