@@ -1,0 +1,3 @@
+*.google.pl
+*.google.com
+

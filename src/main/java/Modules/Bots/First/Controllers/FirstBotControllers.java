@@ -42,11 +42,11 @@ public class FirstBotControllers implements IBotController {
      * @param filtrExtensionsDomain
      */
     @Override
-    public void start(String keyword, String filtrExtensionsDomain) {
+    public void start(String keyword, String filtrExtensionsDomain, String sourcePages) {
         BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.bot_running")));
 
         new AsyncService().single(() -> {
-            this.bot.start(keyword, filtrExtensionsDomain);
+            this.bot.start(keyword, filtrExtensionsDomain, sourcePages);
         });
     }
 

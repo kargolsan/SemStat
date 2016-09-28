@@ -1,5 +1,9 @@
 package Modules.Bots.First.Services;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.net.URI;
 import java.util.regex.Matcher;
@@ -12,6 +16,8 @@ import Application.Contracts.SearchEngines.ISearchEngine;
 import Application.Controllers.Application.LogsController;
 import Application.Controllers.Application.BottomStripController;
 import Modules.SearchEngines.Google.Services.GoogleSearchEngineService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,6 +26,9 @@ import Modules.SearchEngines.Google.Services.GoogleSearchEngineService;
  * Time: 17:11
  */
 public class BotService {
+
+    /** @var logger */
+    private static final Logger logger = LogManager.getLogger(AnalyzeBotLong.class);
 
     /* @var interrupt analyzer */
     private Boolean interrupt = false;
@@ -48,6 +57,9 @@ public class BotService {
     /* @var resource bundle */
     private ResourceBundle bundle;
 
+    /** @var text file with except domains */
+    private static final String EXCEPTS_FILE = "excepts.txt";
+
     /**
      * Constructor
      *
@@ -61,7 +73,7 @@ public class BotService {
         this.bundle = bundle;
 
         this.filtrExtensionsDomainService = new FiltrExtensionsDomainService();
-        this.parseService = new ParseService(this.filtrExtensionsDomainService, this);
+        this.parseService = new ParseService(this.filtrExtensionsDomainService, this, this.bundle);
         this.processorService = new ProcessorService();
         this.analyzePreLinksSearchEngineService = new AnalyzePreLinksSearchEngineService(this, this.bundle);
         this.analyzeBotLong = new AnalyzeBotLong(this, this.bundle);
@@ -81,10 +93,15 @@ public class BotService {
      *
      * @param keyword
      * @param filtrExtensionsDomain
+     * @param sourcePages
      */
-    public void start(String keyword, String filtrExtensionsDomain) {
-        this.filtrExtensionsDomainService.setFiltrExtensionsDomain(filtrExtensionsDomain);
+    public void start(String keyword, String filtrExtensionsDomain, String sourcePages) {
         clearBot();
+        this.parseService.addLinksForAnalyze(this.parseService.extractLinks(sourcePages));
+
+        this.parseService.addExceptDomainsFromFile(getExceptsDomainFromFile());
+        this.filtrExtensionsDomainService.setFiltrExtensionsDomain(filtrExtensionsDomain);
+
         runAutomationBot(getPreLinksApiSearchEngine(keyword), keyword);
     }
 
@@ -175,5 +192,42 @@ public class BotService {
                 this.interrupt,
                 this.bundle
         );
+    }
+
+    /**
+     * Add urls to list from file
+     * to long analyzed keyword
+     *
+     * @return
+     */
+    private List<String> getExceptsDomainFromFile(){
+        List<String> urls = new ArrayList<>();
+
+        File f = new File(EXCEPTS_FILE);
+        if(!f.exists() || f.isDirectory()) return urls;
+
+        BufferedReader br = null;
+        String sCurrentLine;
+
+        try {
+            br = new BufferedReader(new FileReader(EXCEPTS_FILE));
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                if (sCurrentLine == "") continue;
+
+                if (!sCurrentLine.contains("http")) sCurrentLine = "http://" + sCurrentLine;
+
+                urls.add(sCurrentLine);
+            }
+        } catch (IOException e) {
+            this.logger.error("Błąd podczas odczytywania danych z pliku " + EXCEPTS_FILE, e);
+        } finally {
+            try {
+                if (br != null)br.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return urls;
     }
 }

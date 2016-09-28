@@ -28,6 +28,8 @@ import Modules.SearchEngines.Google.Services.GoogleSearchEngineService;
 public class BotController implements Initializable {
 
     @FXML
+    private SourcesController sourcesController;
+    @FXML
     private TextField keyword;
     @FXML
     private TextField extensionsDomain;
@@ -62,6 +64,10 @@ public class BotController implements Initializable {
 
     /* @var bot */
     IBotController bot;
+
+    public void setSourcesController(SourcesController sourcesController){
+        this.sourcesController = sourcesController;
+    }
 
     /**
      * Called to initialize a controller after its root element has been
@@ -103,7 +109,7 @@ public class BotController implements Initializable {
         this.analyze.setDisable(true);
         this.stop.setDisable(false);
 
-        this.bot.start(keyword, this.extensionsDomain.getText());
+        this.bot.start(keyword, this.extensionsDomain.getText(), this.sourcesController.getText().getText());
     }
 
     /**

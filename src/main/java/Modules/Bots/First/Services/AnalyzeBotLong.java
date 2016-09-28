@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,6 +38,9 @@ public class AnalyzeBotLong {
     /* @var text file with urls */
     private static final String TEXT_FILE = "urls.txt";
 
+    /* @var user agent for jsoup */
+    private static final String USER_AGENT = PropertyService.get("user_agent", "Application/Resources/properties.properties");
+
     /**
      * Constructor
      *
@@ -56,35 +61,35 @@ public class AnalyzeBotLong {
 
         // blokada dodawania linków do wyników jeżeli domena istnieje w linkach wstępnych
 
-        List<String> urlsToAnalyzed = new ArrayList<>();
+        List<Future<?>> futures = new ArrayList<Future<?>>();
 
         if (this.bot.isInterrupted()) return;
 
-        String userAgent = PropertyService.get("user_agent", "Application/Resources/properties.properties");
+        this.bot.getParseService().addLinksForAnalyze(addUrlsFromFile(keyword));
+        this.bot.getParseService().addExceptDomains(addUrlsFromFile(keyword));
 
-        urlsToAnalyzed.addAll(addDomainsFromFile(keyword));
-        urlsToAnalyzed.addAll(this.bot.getParseService().getUrlsToAnalyze());
-
-        if (urlsToAnalyzed.size() < getMinimalityUrls()){
-            LogsController.error(String.format(this.bundle.getString("robot.log.require_minimality_fifteen_urls_for_long_analyzed"), getMinimalityUrls()));
+        if (this.bot.getParseService().getUrlsToAnalyze().size() < getMinimalityLinks()){
+            LogsController.error(String.format(this.bundle.getString("robot.log.require_minimality_fifteen_urls_for_long_analyzed"), getMinimalityLinks()));
             return;
         }
 
-        while (urlsToAnalyzed.size() > 0) {
+        while (this.bot.getParseService().getUrlsToAnalyze().size() > 0) {
 
-            String url = urlsToAnalyzed.get(0);
-            urlsToAnalyzed.remove(0);
+            String url = this.bot.getParseService().getUrlsToAnalyze().get(0);
+
+            if (url == null) continue;
+
+            this.bot.getParseService().getUrlsAnalyzed().add(url);
+            this.bot.getParseService().getUrlsToAnalyze().remove(url);
+
+            if (this.bot.getParseService().hasDomainExceptInFile(url)) continue;
 
             if (this.bot.isInterrupted()) return;
 
-            executor.execute(() -> {
-
+            Future<?> f = executor.submit(() -> {
                 if (this.bot.isInterrupted()) return;
-
-                String ads = "?utm_source=http://fb.me/itgolo&utm_medium=itgolo&utm_term=Program%20SemStat%20SEO%20i%20SEM%20http://fb.me/itgolo";
-
                 try {
-                    Document doc = Jsoup.connect(url + ads).userAgent(userAgent).get();
+                    Document doc = Jsoup.connect(url).userAgent(USER_AGENT).get();
 
                     BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.analyzing_website"), doc.baseUri()));
 
@@ -93,22 +98,10 @@ public class AnalyzeBotLong {
                     this.bot.getParseService().htmlToLinks(doc);
 
                 } catch (Exception e) { }
-
-
             });
-            if (urlsToAnalyzed.size() <= 0){
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
-                urlsToAnalyzed.addAll(this.bot.getParseService().getUrlsToAnalyze());
-                this.bot.getParseService().getUrlsToAnalyze().clear();
-
-            }
-
-
+            futures.add(f);
+            checkLinksIsEmpty(futures);
         }
     }
 
@@ -119,7 +112,7 @@ public class AnalyzeBotLong {
      * @param keyword
      * @return
      */
-    private List<String> addDomainsFromFile(String keyword){
+    private List<String> addUrlsFromFile(String keyword){
         List<String> urls = new ArrayList<>();
 
         File f = new File(TEXT_FILE);
@@ -139,8 +132,6 @@ public class AnalyzeBotLong {
 
                 urls.add(sCurrentLine);
             }
-
-            this.bot.getParseService().addLinksForAnalyze(urls);
         } catch (IOException e) {
             logger.error("Błąd podczas odczytywania danych z pliku urls.txt", e);
         } finally {
@@ -153,13 +144,32 @@ public class AnalyzeBotLong {
         return urls;
     }
 
+    /**
+     * Check links is empty
+     *
+     * @param futures
+     */
+    private void checkLinksIsEmpty(List<Future<?>> futures){
+
+        if (this.bot.getParseService().getUrlsToAnalyze().size() <= 0){
+            for(Future<?> future : futures)
+                try {
+                    future.get();
+                    if (this.bot.isInterrupted()) return;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
 
     /**
      * Get minimality urls for urls.txt
      *
      * @return property
      */
-    private Integer getMinimalityUrls(){
+    private Integer getMinimalityLinks(){
         String prop = PropertyService.get("minimality_urls_in_file_for_long_analyzed", "Application/Resources/properties.properties");
         return Integer.parseInt(prop);
     }

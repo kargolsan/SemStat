@@ -13,8 +13,9 @@ public interface IBotController {
      *
      * @param keyword
      * @param filtrExtensionsDomain
+     * @param sourcePages
      */
-    void start(String keyword, String filtrExtensionsDomain);
+    void start(String keyword, String filtrExtensionsDomain, String sourcePages);
 
     /**
      * Interrupt robot

@@ -7,16 +7,36 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="346.0" prefWidth="573.0" spacing="5.0" stylesheets="@../../Assets/Styles/Application/Sources.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.Application.SourcesController">
+<VBox alignment="CENTER" spacing="5.0" stylesheets="@../../Assets/Styles/Application/Sources.css" xmlns="http://javafx.com/javafx/8.0.91" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Application.Controllers.Application.SourcesController">
     <children>
-      <HBox alignment="CENTER" spacing="10.0">
+      <HBox alignment="CENTER">
+         <children>
+            <VBox spacing="10.0">
+               <children>
+                  <Label text="%tabs.sources.except_domains" />
+                  <TextArea id="excepts" fx:id="excepts" prefHeight="191.0" prefWidth="399.0" />
+               </children>
+               <HBox.margin>
+                  <Insets bottom="15.0" />
+               </HBox.margin>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" spacing="25.0">
          <children>
             <VBox spacing="10.0">
                <children>
                   <Label text="%tabs.sources.urls" />
-                  <TextArea id="sources" fx:id="sources" />
+                  <TextArea id="sources" fx:id="sources" prefHeight="191.0" prefWidth="399.0" />
                   <Label text="%tabs.sources.tip_template" />
                 <Button id="save" mnemonicParsing="false" onAction="#save" text="%tabs.sources.save" />
+               </children>
+            </VBox>
+            <VBox spacing="10.0">
+               <children>
+                  <Label text="%tabs.sources.extrude_links_from_text" />
+                  <TextArea id="text" fx:id="text" prefHeight="191.0" prefWidth="267.0" />
+                  <Label text="%tabs.sources.tip_extrude" />
                </children>
             </VBox>
          </children>

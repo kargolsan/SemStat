@@ -24,6 +24,9 @@ public class AnalyzePreLinksSearchEngineService {
     /* @var resource bundle */
     private ResourceBundle bundle;
 
+    /* @var user agent for jsoup */
+    private static final String USER_AGENT = PropertyService.get("user_agent", "Application/Resources/properties.properties");
+
     /**
      * Constructor
      *
@@ -43,22 +46,25 @@ public class AnalyzePreLinksSearchEngineService {
      * @param keyword
      */
     public void analyze(ExecutorService executor, List<Application.Contracts.SearchEngines.IResultModel>  preLinksApiSearchEngine, String keyword) {
-        String userAgent = PropertyService.get("user_agent", "Application/Resources/properties.properties");
 
         for (Application.Contracts.SearchEngines.IResultModel link : preLinksApiSearchEngine) {
 
             if (this.bot.isInterrupted()) return;
 
+            if (this.bot.getParseService().hasDomainExceptInFile(link.getUrl())) continue;
+
             executor.execute(() -> {
 
                 try {
-                    Document html = Jsoup.connect(link.getUrl()).userAgent(userAgent).get();
+                    Document html = Jsoup.connect(link.getUrl()).userAgent(USER_AGENT).get();
 
                     BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.analyzing_website"), html.baseUri()));
 
                     this.bot.getParseService().htmlToResult(html, keyword);
 
                     this.bot.getParseService().htmlToLinks(html);
+
+                    this.bot.getParseService().getUrlsAnalyzed().add(link.getUrl());
 
                 } catch (IOException e) {}
             });

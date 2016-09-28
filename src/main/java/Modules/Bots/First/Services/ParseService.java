@@ -2,6 +2,7 @@ package Modules.Bots.First.Services;
 
 import Application.Contracts.Data.IResultModel;
 import Application.Controllers.Application.BotController;
+import Application.Controllers.Application.BottomStripController;
 import Application.Services.Application.SettingsService;
 import Application.Services.PropertyService;
 import Modules.Data.File.Models.Data;
@@ -10,6 +11,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -36,6 +38,15 @@ public class ParseService {
     /* @var urls to analyze */
     private List<String> urlsToAnalyze;
 
+    /* @var urls analyzed */
+    private List<String> urlsAnalyzed;
+
+    /* @var except domains */
+    private List<String> exceptDomains;
+
+    /* @var except domains from file */
+    private List<String> exceptDomainsFromFile;
+
     /* @var list data for save */
     private List<IResultModel> resultsToSave;
 
@@ -45,19 +56,35 @@ public class ParseService {
     /** @var bot service */
     private BotService bot;
 
+    /* @var resource bundle */
+    private ResourceBundle bundle;
+
     /* @var file with properties of application */
     private static final String PROPERTIES_FILE = "Application/Resources/properties.properties";
 
     /**
      * Constructor
      */
-    public ParseService(FiltrExtensionsDomainService filtrExtensionsDomainService, BotService bot){
+    public ParseService(FiltrExtensionsDomainService filtrExtensionsDomainService, BotService bot, ResourceBundle bundle){
         this.filtrExtensionsDomainService = filtrExtensionsDomainService;
         this.bot = bot;
+        this.bundle = bundle;
 
         this.domainsAnalyzedLimit = new HashMap<>();
         this.urlsToAnalyze = new ArrayList<>();
         this.resultsToSave = new ArrayList<>();
+        this.exceptDomains = new ArrayList<>();
+        this.urlsAnalyzed = new ArrayList<>();
+        this.exceptDomainsFromFile = new ArrayList<>();
+    }
+
+    /**
+     * Get urls to analyze
+     *
+     * @return urls
+     */
+    public List<String> getUrlsToAnalyze() {
+        return urlsToAnalyze;
     }
 
     /**
@@ -70,12 +97,12 @@ public class ParseService {
     }
 
     /**
-     * Get urls to analyze
+     * Get urls analyzed
      *
      * @return urls
      */
-    public List<String> getUrlsToAnalyze() {
-        return urlsToAnalyze;
+    public List<String> getUrlsAnalyzed() {
+        return urlsAnalyzed;
     }
 
     /**
@@ -165,14 +192,13 @@ public class ParseService {
 
             String getRLS = SettingsService.get("robot.limit_sub_site_analyze_domain");
             String defaultRLS = PropertyService.get("default_robot_limit_sub_site_analyze_domain", PROPERTIES_FILE);
-
             getRLS = (getRLS == "") ? defaultRLS : getRLS;
             Integer limitDomain = Integer.parseInt(getRLS);
-
-            if (this.domainsAnalyzedLimit.get(domain) >= limitDomain) continue;
-
+            if (this.domainsAnalyzedLimit.get(domain) != null){
+                if (this.domainsAnalyzedLimit.get(domain) >= limitDomain) continue;
+            }
             this.domainsAnalyzedLimit.put(domain, this.domainsAnalyzedLimit.get(domain) + 1);
-
+            if (this.urlsAnalyzed.contains(link)) continue;
             this.urlsToAnalyze.add(link);
         }
     }
@@ -181,9 +207,9 @@ public class ParseService {
     /**
      * Returns a list with all links contained in the input
      */
-    public static List<String> extractLinks(String text) {
+    public List<String> extractLinks(String text) {
         List<String> containedUrls = new ArrayList<String>();
-        String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+        String urlRegex = "((https?):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
         Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
         Matcher urlMatcher = pattern.matcher(text);
 
@@ -193,6 +219,7 @@ public class ParseService {
         }
 
         return containedUrls;
+
     }
 
     /**
@@ -201,11 +228,84 @@ public class ParseService {
      * @param data
      */
     public void addResultToSave(IResultModel data) {
+
+        if (this.exceptDomains.contains(data.getDomain())) return;
+
+        if (this.exceptDomainsFromFile.contains(data.getDomain())) return;
+
         this.countFound += 1;
 
         this.resultsToSave.add(data);
 
         BotController.setCountFound(this.countFound.toString());
+    }
+
+    /**
+     * Set except urls
+     *
+     * @param urls
+     */
+    public void addExceptDomains(List<String> urls){
+        for (String url : urls){
+            String domain = getDomainName(url);
+
+            if (domain == null) continue;
+            if (this.exceptDomains.contains(domain)) continue;
+
+            this.exceptDomains.add(domain);
+        }
+    }
+
+    /**
+     * Set except urls
+     *
+     * @param urls
+     */
+    public void addExceptDomainsFromFile(List<String> urls){
+        for (String url : urls) {
+            String domain = getDomainName(url);
+
+            if (url.contains("*")) {
+                if (url.contains("http://")){
+                    url = url.replace("http://", "");
+                }
+                if (url.contains("https://")){
+                    url = url.replace("https://", "");
+                }
+                domain = url;
+            }
+
+            if (domain == null) continue;
+
+            if (this.exceptDomainsFromFile.contains(domain)) continue;
+
+            this.exceptDomainsFromFile.add(domain);
+        }
+    }
+
+    /**
+     * Check is domain exist in domain excepts in file
+     *
+     * @param url
+     * @return
+     */
+    public Boolean hasDomainExceptInFile(String url){
+        String domain = getDomainName(url);
+        if (domain == null) return false;
+
+        for (String patternDomain : this.exceptDomainsFromFile){
+            if (patternDomain.contains("*")){
+                String s = patternDomain.replace("*", "");
+
+                if (s.startsWith("."))  {
+                    s = s.substring(1);
+                }
+                if (domain.contains(s)) return true;
+            }
+            if (patternDomain.equals(domain)) return true;
+        }
+
+        return false;
     }
 
     /**
@@ -215,13 +315,18 @@ public class ParseService {
      * @return
      */
     public String getDomainName(String url) {
-        URI uri = null;
         try {
-            uri = new URI(url);
+            URI uri = new URI(url);
             String domain = uri.getHost();
+
+            if (uri.getHost() == null) {
+                URI uri2 = new URI (url.replace("_", ""));
+                domain = uri2.getHost();
+            }
+
+            if (domain == null) return null;
             return domain.startsWith("www.") ? domain.substring(4) : domain;
-        } catch (URISyntaxException e) {
-        }
+        } catch (URISyntaxException e) {}
         return null;
     }
 
@@ -232,6 +337,8 @@ public class ParseService {
         this.domainsAnalyzedLimit.clear();
         this.urlsToAnalyze.clear();
         this.resultsToSave.clear();
+        this.exceptDomains.clear();
+        this.exceptDomainsFromFile.clear();
         this.countAnalyzed = 0;
         this.countFound = 0;
     }

@@ -2,7 +2,12 @@ package Application.Controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import Application.Controllers.Application.BotController;
+import Application.Controllers.Application.Settings.DefaultController;
+import Application.Controllers.Application.SourcesController;
 import Application.Stages.Loader;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 /**
@@ -13,6 +18,12 @@ import javafx.fxml.Initializable;
  */
 public class ApplicationController implements Initializable {
 
+    @FXML
+    private SourcesController sourcesController;
+
+    @FXML
+    private BotController botController;
+
     /**
      * Called to initialize a controller after its root element has been
      * completely processed.
@@ -20,5 +31,6 @@ public class ApplicationController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Loader.getStage().hide();
+        this.botController.setSourcesController(this.sourcesController);
     }
 }
