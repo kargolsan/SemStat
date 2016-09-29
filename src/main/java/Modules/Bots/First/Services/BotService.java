@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +57,9 @@ public class BotService {
 
     /* @var resource bundle */
     private ResourceBundle bundle;
+
+    /* @var executor long */
+    private ExecutorService executorLong;
 
     /** @var text file with except domains */
     private static final String EXCEPTS_FILE = "excepts.txt";
@@ -122,7 +126,7 @@ public class BotService {
         while (!executor.isTerminated()) {
         }
 
-        ExecutorService executorLong = Executors.newFixedThreadPool(processorService.getLimitThreads());
+        this.executorLong = Executors.newFixedThreadPool(processorService.getLimitThreads());
 
         this.analyzeBotLong.start(executorLong, keyword);
 
@@ -139,6 +143,10 @@ public class BotService {
      */
     public void interrupt() {
         this.interrupt = true;
+        try {
+            this.executorLong.awaitTermination(0, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+        }
     }
 
     /**
@@ -156,11 +164,12 @@ public class BotService {
      * @param keyword
      */
     private void finish(String keyword) {
+
+        this.parseService.setResultsToSave(this.parseService.beforeSaved(this.parseService.getResultsToSave()));
         BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.data_saving"), keyword));
-
         this.saveService.save(this.parseService.getResultsToSave());
+        this.parseService.finishBot();
         this.finishRunnable.run();
-
         BottomStripController.setStatus(String.format(this.bundle.getString("robot.status.job_finished"), keyword));
         LogsController.success(String.format(this.bundle.getString("robot.log.job_finished"), keyword));
     }

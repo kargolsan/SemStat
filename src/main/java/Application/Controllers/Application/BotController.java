@@ -117,6 +117,8 @@ public class BotController implements Initializable {
      */
     @FXML
     public void stop(){
+        this.stop.setText(this.bundle.getString("tabs.bot.wait"));
+        this.stop.setDisable(true);
         this.bot.interrupt();
     }
 
@@ -161,9 +163,12 @@ public class BotController implements Initializable {
     private IBotController buildBot(){
         ISaveService saveService = this.botService.getProviderDataService(this.bundle);
         return new FirstBotControllers(saveService, ()->{
-            analyze.setDisable(false);
-            stop.setDisable(true);
-        }, bundle);
+            Platform.runLater(()->{
+                this.stop.setText(this.bundle.getString("tabs.bot.break"));
+            });
+            this.analyze.setDisable(false);
+            this.stop.setDisable(true);
+        }, this.bundle);
     }
 
     /**

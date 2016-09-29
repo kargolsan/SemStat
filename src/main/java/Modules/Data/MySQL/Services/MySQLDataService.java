@@ -5,6 +5,8 @@ import Application.Contracts.Data.ISaveService;
 import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.LogsController;
 import Application.Services.Application.SettingsService;
+import Modules.Extensions.PhoneEmail.Services.PhoneEmailService;
+import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,6 +46,9 @@ public class MySQLDataService implements ISaveService {
      */
     private ResourceBundle bundle;
 
+    /** @var bundle resource */
+    private PhoneEmailService phoneEmailService;
+
     /**
      * Constructor
      *
@@ -51,6 +56,7 @@ public class MySQLDataService implements ISaveService {
      */
     public MySQLDataService(ResourceBundle bundle) {
         this.bundle = bundle;
+        this.phoneEmailService = new PhoneEmailService(null, bundle);
         fillPropertiesMySQL();
     }
 
@@ -200,11 +206,33 @@ public class MySQLDataService implements ISaveService {
      * @throws SQLException
      */
     private void addDataToDatabase(IResultModel data, Connection conn) throws SQLException {
-        String query = String.format(" insert into %1$s (%2$s, %3$s, %4$s, %5$s, %6$s)"
-                + " values (?, ?, ?, ?, ?)", this.tableName, this.columnDomain, this.columnUrl, this.columnQuantity, this.columnDate, this.columnKeyword);
 
-        // create the mysql insert prepared statement
+        List<String> columns = new ArrayList<>();
+        columns.add(this.columnDomain);
+        columns.add(this.columnUrl);
+        columns.add(this.columnQuantity);
+        columns.add(this.columnDate);
+        columns.add(this.columnKeyword);
+
+        List<String> asks = new ArrayList<>();
+        columns.forEach(c -> {
+            asks.add("?");
+        });
+
+        if (phoneEmailService.access()){
+            String columnPhone = SettingsService.get("extension.phone_email.mysqlColumnPhone");
+            String columnEmail = SettingsService.get("extension.phone_email.mysqlColumnEmail");
+            columns.add(columnPhone);
+            columns.add(columnEmail);
+            asks.add("?");
+            asks.add("?");
+        }
+
+        String query = String.format(" insert into %1$s (%2$s)"
+                + " values (%3$s)", this.tableName, Joiner.on(",").join(columns), Joiner.on(",").join(asks));
+
         PreparedStatement preparedStmt = conn.prepareStatement(query);
+
         preparedStmt.setString(1, data.getDomain());
         preparedStmt.setString(2, data.getUrl());
         preparedStmt.setInt(3, data.getQuantity());
@@ -212,7 +240,13 @@ public class MySQLDataService implements ISaveService {
         preparedStmt.setTimestamp(4, timestamp);
         preparedStmt.setString(5, data.getKeyword());
 
-        // execute the prepared statement
+        if (phoneEmailService.access()){
+            data.setPhones((data.getPhones()==null) ? "" : data.getPhones());
+            data.setEmails((data.getEmails()==null) ? "" : data.getEmails());
+            preparedStmt.setString(6, data.getPhones());
+            preparedStmt.setString(7, data.getEmails());
+        }
+
         preparedStmt.execute();
     }
 }

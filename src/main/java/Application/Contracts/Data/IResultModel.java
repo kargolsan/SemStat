@@ -19,6 +19,10 @@ public interface IResultModel {
 
     void setKeyword(String keyword);
 
+    void setPhones(String phone);
+
+    void setEmails(String phone);
+
     String getDomain();
 
     String getUrl();
@@ -28,4 +32,8 @@ public interface IResultModel {
     Calendar getDate();
 
     String getKeyword();
+
+    String getPhones();
+
+    String getEmails();
 }

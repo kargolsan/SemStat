@@ -86,7 +86,7 @@ Your table name and column name add to configuration application in setting tab.
 
 ## Deploy
 
-####Requirements
+#### Requirements
 
 - Java 8 or higher. Gradle must run with Java 8
 - Wix Toolset or WixEdit must be installed
@@ -107,4 +107,34 @@ For create *.msi run tasks of gradle:
 - gradle msi create msi installer for architecture 32bit
 - gradle msi64 create msi installer for architecture 64bit
 
+## Extensions
+
+#### Phone & Email
+- Add to your database MySQL two column for phones and emails (TEXT Type)
+
+## Add extensions
+
+- Add get and set of new property to IResultModel
+- Implements properties in models
+- Add service with implement IExtension
+- Add instance IExtension to Data Services for saved data
+- Add extensions for save data to file in save method:
+```
+if (phoneEmailService.access()){
+    s.setPhone((s.getPhone()==null) ? "" : s.getPhone());
+    s.setEmail((s.getEmail()==null) ? "" : s.getEmail());
+    pairs.add(String.format("\"phones\":\"%1$s\"", s.getPhone()));
+    pairs.add(String.format("\"emails\":\"%1$s\"", s.getEmail()));
+}
+```
+- Add extensions for other save data
+- Create tab with interface
+- Add extension in ParseService in htmlToResult method example:
+```
+if (this.phoneEmailService.access()){
+    this.phoneEmailService.analyze(result, doc);
+}
+```
+- Add call for clear and finish methods of extension
+- Add to parse service method of before saved
 

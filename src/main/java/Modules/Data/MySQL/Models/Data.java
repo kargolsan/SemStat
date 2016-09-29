@@ -22,6 +22,30 @@ public class Data implements IResultModel {
 
     private String keyword;
 
+    private String phones;
+
+    private String emails;
+
+    @Override
+    public String getPhones() {
+        return phones;
+    }
+
+    @Override
+    public void setPhones(String phones) {
+        this.phones = phones;
+    }
+
+    @Override
+    public String getEmails() {
+        return emails;
+    }
+
+    @Override
+    public void setEmails(String emails) {
+        this.emails = emails;
+    }
+
     @Override
     public String getDomain() {
         return domain;

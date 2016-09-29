@@ -6,6 +6,7 @@ import Application.Controllers.Application.BottomStripController;
 import Application.Services.Application.SettingsService;
 import Application.Services.PropertyService;
 import Modules.Data.File.Models.Data;
+import Modules.Extensions.PhoneEmail.Services.PhoneEmailService;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -53,6 +54,9 @@ public class ParseService {
     /* @var filtr extensions domain service */
     private FiltrExtensionsDomainService filtrExtensionsDomainService;
 
+    /** @var bundle resource */
+    private PhoneEmailService phoneEmailService;
+
     /** @var bot service */
     private BotService bot;
 
@@ -63,10 +67,29 @@ public class ParseService {
     private static final String PROPERTIES_FILE = "Application/Resources/properties.properties";
 
     /**
+     * Get count analyzed
+     *
+     * @return count analyzed
+     */
+    public Integer getCountAnalyzed() {
+        return countAnalyzed;
+    }
+
+    /**
+     * Set count analyzed
+     *
+     * @param countAnalyzed
+     */
+    public void setCountAnalyzed(Integer countAnalyzed) {
+        this.countAnalyzed = countAnalyzed;
+    }
+
+    /**
      * Constructor
      */
     public ParseService(FiltrExtensionsDomainService filtrExtensionsDomainService, BotService bot, ResourceBundle bundle){
         this.filtrExtensionsDomainService = filtrExtensionsDomainService;
+        this.phoneEmailService = new PhoneEmailService(this, bundle);
         this.bot = bot;
         this.bundle = bundle;
 
@@ -97,6 +120,15 @@ public class ParseService {
     }
 
     /**
+     * Set result to save
+     *
+     * @param resultsToSave
+     */
+    public void setResultsToSave(List<IResultModel> resultsToSave) {
+        this.resultsToSave = resultsToSave;
+    }
+
+    /**
      * Get urls analyzed
      *
      * @return urls
@@ -120,7 +152,7 @@ public class ParseService {
         this.countAnalyzed += 1;
         BotController.setCountAnalyzed(this.countAnalyzed.toString());
 
-        String body = doc.select("body").text();
+        String body = doc.text();
 
         if (body.toLowerCase().contains(keyword.toLowerCase())) {
 
@@ -134,6 +166,10 @@ public class ParseService {
             result.setQuantity(quantity);
             result.setDate(Calendar.getInstance());
             result.setKeyword(keyword);
+
+            if (this.phoneEmailService.access()){
+                this.phoneEmailService.analyze(doc);
+            }
 
             addResultToSave(result);
         }
@@ -158,12 +194,17 @@ public class ParseService {
 
             String href = a.attr("href");
 
-            if (href != "" && href.contains("http://") || href.contains("https://")) {
+            if (href != "" && (href.contains("http://") || href.contains("https://"))) {
                 if (!href.startsWith("http")) {
                     links.addAll(extractLinks(href));
                 } else {
                     links.add(href);
                 }
+
+            } else {
+                String link = "http://" + getDomainName(doc.baseUri()) + "/" + href;
+
+                links.add(link);
             }
         }
 
@@ -217,7 +258,6 @@ public class ParseService {
             containedUrls.add(text.substring(urlMatcher.start(0),
                     urlMatcher.end(0)));
         }
-
         return containedUrls;
 
     }
@@ -331,6 +371,17 @@ public class ParseService {
     }
 
     /**
+     * Run before save for modification results
+     *
+     * @param resultsToSave
+     * @return resultsToSave
+     */
+    public List<IResultModel> beforeSaved(List<IResultModel> resultsToSave){
+        resultsToSave = this.phoneEmailService.beforeSaved(resultsToSave);
+        return resultsToSave;
+    }
+
+    /**
      * Call from clear bot
      */
     public void clearBot(){
@@ -338,8 +389,16 @@ public class ParseService {
         this.urlsToAnalyze.clear();
         this.resultsToSave.clear();
         this.exceptDomains.clear();
+        this.phoneEmailService.clear();
         this.exceptDomainsFromFile.clear();
         this.countAnalyzed = 0;
         this.countFound = 0;
+    }
+
+    /**
+     * Call for finished bot
+     */
+    public void finishBot(){
+        this.phoneEmailService.finish();
     }
 }

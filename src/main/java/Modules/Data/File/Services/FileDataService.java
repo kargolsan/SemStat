@@ -5,7 +5,9 @@ import Application.Contracts.Data.ISaveService;
 import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.LogsController;
 import Modules.Data.File.Models.Data;
+import Modules.Extensions.PhoneEmail.Services.PhoneEmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,6 +39,9 @@ public class FileDataService implements ISaveService {
     /** @var bundle resource */
     private ResourceBundle bundle;
 
+    /** @var bundle resource */
+    private PhoneEmailService phoneEmailService;
+
     /**
      * Constructor
      *
@@ -44,6 +49,7 @@ public class FileDataService implements ISaveService {
      */
     public FileDataService(ResourceBundle bundle){
         this.bundle = bundle;
+        this.phoneEmailService = new PhoneEmailService(null, bundle);
     }
 
     /**
@@ -68,14 +74,21 @@ public class FileDataService implements ISaveService {
             out = new PrintWriter(new FileOutputStream(new File(DIR + "\\" +TEXT_FILE), true));
             for (IResultModel s : data){
 
-                String domain = s.getDomain();
-                String url = s.getUrl();
-                String quantity = Objects.toString(s.getQuantity());
-                String date = Objects.toString(s.getDate().getTimeInMillis());
-                String keyword = s.getKeyword();
+                List<String> pairs = new ArrayList<>();
+                pairs.add(String.format("\"domain\":\"%1$s\"", s.getDomain()));
+                pairs.add(String.format("\"url\":\"%1$s\"", s.getUrl()));
+                pairs.add(String.format("\"quantity\":\"%1$s\"", Objects.toString(s.getQuantity())));
+                pairs.add(String.format("\"date\":\"%1$s\"", Objects.toString(s.getDate().getTimeInMillis())));
+                pairs.add(String.format("\"keyword\":\"%1$s\"", s.getKeyword()));
 
-                out.println(String.format("{\"domain\":\"%1$s\",\"url\":\"%2$s\",\"quantity\":\"%3$s\",\"date\":\"%4$s\",\"keyword\":\"%5$s\"}",
-                        domain, url, quantity, date, keyword));
+                if (phoneEmailService.access()){
+                    s.setPhones((s.getPhones()==null) ? "" : s.getPhones());
+                    s.setEmails((s.getEmails()==null) ? "" : s.getEmails());
+                    pairs.add(String.format("\"phones\":\"%1$s\"", s.getPhones()));
+                    pairs.add(String.format("\"emails\":\"%1$s\"", s.getEmails()));
+                }
+
+                out.println(String.format("{%1$s}", Joiner.on(",").join(pairs)));
 
                 counter++;
                 BotController.setCountUnique(counter.toString());
