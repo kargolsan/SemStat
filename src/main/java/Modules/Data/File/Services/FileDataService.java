@@ -61,6 +61,7 @@ public class FileDataService implements ISaveService {
     public void save(List<IResultModel> data) {
 
         data = removeDuplicateData(data);
+
         data = deleteExistData(data);
 
         if (data.size() <= 0) return;

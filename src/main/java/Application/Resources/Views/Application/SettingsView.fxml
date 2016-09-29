@@ -96,6 +96,23 @@
                                         </AnchorPane>
                                     </content>
                                 </TitledPane>
+                                <TitledPane animated="false" text="%tabs.settings.menu.other">
+                                    <content>
+                                        <AnchorPane>
+                                            <children>
+                                                <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <children>
+                                                        <Label onMouseClicked="#otherLicense" text="%tabs.settings.menu.other.license">
+                                                            <cursor>
+                                                                <Cursor fx:constant="HAND" />
+                                                            </cursor>
+                                                        </Label>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                </TitledPane>
                             </panes>
                         </Accordion>
                     </children>
@@ -115,6 +132,7 @@
                                           <fx:include fx:id="processorGeneral" source="Settings/ProcessorGeneral.fxml" />
                                           <fx:include fx:id="saveDataFile" source="Settings/SaveDataFile.fxml" />
                                           <fx:include fx:id="saveDataMysql" source="Settings/SaveDataMysql.fxml" />
+                                          <fx:include fx:id="otherLicense" source="Settings/OtherLicenseView.fxml" />
                                       </children>
                                   </HBox>
                            </children>

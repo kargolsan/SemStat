@@ -2,6 +2,7 @@ package Application.Stages;
 
 import Application.Services.AsyncService;
 import Application.Services.LanguageService;
+import Application.Services.LicenseService;
 import Application.Services.PropertyService;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -67,6 +68,12 @@ public class Application extends javafx.application.Application {
             primaryStage.setScene(scene);
             primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(ICON)));
             primaryStage.setTitle(String.format("%1$s - v.%2$s", title, version));
+
+            LicenseService licenseService = new LicenseService(null);
+            if (!licenseService.hasLicense("application")){
+                primaryStage.setTitle(primaryStage.getTitle() + " - " + this.BUNDLE.getString("application.non_commercial"));
+            }
+
             primaryStage.show();
         } catch (Exception ex){
             logger.fatal("Problem podczas wczytywanie stage application.", ex);

@@ -137,4 +137,7 @@ if (this.phoneEmailService.access()){
 ```
 - Add call for clear and finish methods of extension
 - Add to parse service method of before saved
+- Add license methods
+- Add extension to license service
+- Add status license to settings -> others -> licenses
 

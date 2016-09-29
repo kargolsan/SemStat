@@ -6,9 +6,13 @@ import java.util.ResourceBundle;
 import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.Settings.DefaultController;
 import Application.Controllers.Application.SourcesController;
+import Application.Services.ApplicationService;
+import Application.Services.LicenseService;
 import Application.Stages.Loader;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,18 +23,28 @@ import javafx.fxml.Initializable;
 public class ApplicationController implements Initializable {
 
     @FXML
+    private VBox root;
+
+    @FXML
     private SourcesController sourcesController;
 
     @FXML
     private BotController botController;
+
+    /* @var bundle resource */
+    private ResourceBundle bundle;
 
     /**
      * Called to initialize a controller after its root element has been
      * completely processed.
      */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle bundle) {
         Loader.getStage().hide();
+        this.bundle = bundle;
         this.botController.setSourcesController(this.sourcesController);
+
+        ApplicationService applicationService = new ApplicationService(bundle);
+        applicationService.checkNewVersion();
     }
 }

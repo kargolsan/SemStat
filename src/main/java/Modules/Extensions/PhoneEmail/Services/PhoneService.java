@@ -5,15 +5,12 @@ import Application.Controllers.Application.BotController;
 import Application.Controllers.Application.BottomStripController;
 import Application.Services.PropertyService;
 import Modules.Bots.First.Services.ParseService;
-import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberMatch;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import ru.lanwen.verbalregex.VerbalExpression;
 
 import java.net.URI;
 import java.net.URISyntaxException;

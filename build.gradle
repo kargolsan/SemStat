@@ -3,7 +3,7 @@ version "1.0.1"
 def title = "SemStat"
 def iconApp = "/Application/Resources/Assets/Images/Icons/app.png"
 def iconAppIco = "/src/main/java/Application/Resources/Assets/Images/Icons/app.ico"
-def url = "http://www.itgolo.pl"
+def url = "http://itgolo.pl"
 def jreMinVersionMustBe = "1.8.0"
 def versionExe = version
 
@@ -28,6 +28,8 @@ repositories {
 }
 
 dependencies {
+    compile group: "org.apache.maven", name: "maven-artifact", version: "3.0.3"
+    compile group: "joda-time", name: "joda-time", version: "2.9.4"
     compile group: "com.googlecode.libphonenumber", name: "libphonenumber", version: "7.7.1"
     compile group: "com.google.collections", name: "google-collections", version: "1.0"
     compile group: "mysql", name: "mysql-connector-java", version: "6.0.4"
@@ -67,12 +69,15 @@ props.setProperty("title", title)
 props.setProperty("iconApp", iconApp)
 props.setProperty("projectName", project.name)
 props.setProperty("url", url)
+props.setProperty("urlProject", "${url}/semstat")
 props.setProperty("default_processor_limit_threads", "10")
 props.setProperty("default_google_queries_of_keyword", "1")
 props.setProperty("minimality_urls_in_file_for_long_analyzed", "15")
 props.setProperty("default_robot_limit_sub_site_analyze_domain", "15")
 props.setProperty("user_agent", "Application SemStat ${version} for SEO & SEM. Visit www.itgolo.pl.")
 props.setProperty("default_bot_extensions_domain", ".pl, .com, .net, .info, .eu")
+props.setProperty("license_salt", "#123dsfg@werER##")
+props.setProperty("url_app_versions", "${url}/appVersions.txt")
 props.store(file.newWriter(), null)
 
 // Settings for the creation of the output file jar.

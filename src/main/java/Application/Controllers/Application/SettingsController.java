@@ -38,6 +38,8 @@ public class SettingsController implements Initializable {
     private SaveDataFileController saveDataFileController;
     @FXML
     private SaveDataMysqlController saveDataMysqlController;
+    @FXML
+    private OtherLicenseController otherLicenseController;
 
     /** @vars visible roots */
     private BooleanProperty visibleDefault = new SimpleBooleanProperty(false);
@@ -47,6 +49,7 @@ public class SettingsController implements Initializable {
     private BooleanProperty visibleProcessorGeneral = new SimpleBooleanProperty(false);
     private BooleanProperty visibleSaveDataFile = new SimpleBooleanProperty(false);
     private BooleanProperty visibleSaveDataMysql = new SimpleBooleanProperty(false);
+    private BooleanProperty visibleOtherLicense = new SimpleBooleanProperty(false);
 
     /**
      * @var bundle
@@ -132,6 +135,16 @@ public class SettingsController implements Initializable {
     }
 
     /**
+     * Show root
+     */
+    @FXML
+    public void otherLicense(){
+        hideRoots();
+        this.title.setText(this.bundle.getString("tabs.settings.other.license"));
+        this.visibleOtherLicense.set(true);
+    }
+
+    /**
      * Save all settings
      */
     @FXML
@@ -142,6 +155,7 @@ public class SettingsController implements Initializable {
         this.processorGeneralController.save();
         this.saveDataFileController.save();
         this.saveDataMysqlController.save();
+        this.otherLicenseController.save();
 
         LogsController.success(this.bundle.getString("tabs.settings.setting_saved"));
         AlertService.info(this.bundle.getString("dialog_alert.information"), null, this.bundle.getString("tabs.settings.setting_saved"));
@@ -158,6 +172,7 @@ public class SettingsController implements Initializable {
         this.processorGeneralController.getRoot().visibleProperty().bind(this.visibleProcessorGeneral);
         this.saveDataFileController.getRoot().visibleProperty().bind(this.visibleSaveDataFile);
         this.saveDataMysqlController.getRoot().visibleProperty().bind(this.visibleSaveDataMysql);
+        this.otherLicenseController.getRoot().visibleProperty().bind(this.visibleOtherLicense);
 
         this.defaultController.getRoot().managedProperty().bind(this.visibleDefault);
         this.apisGoogleController.getRoot().managedProperty().bind(this.visibleApisGoogle);
@@ -166,6 +181,7 @@ public class SettingsController implements Initializable {
         this.processorGeneralController.getRoot().managedProperty().bind(this.visibleProcessorGeneral);
         this.saveDataFileController.getRoot().managedProperty().bind(this.visibleSaveDataFile);
         this.saveDataMysqlController.getRoot().managedProperty().bind(this.visibleSaveDataMysql);
+        this.otherLicenseController.getRoot().managedProperty().bind(this.visibleOtherLicense);
     }
 
     /**
@@ -179,6 +195,7 @@ public class SettingsController implements Initializable {
         this.visibleProcessorGeneral.set(false);
         this.visibleSaveDataFile.set(false);
         this.visibleSaveDataMysql.set(false);
+        this.visibleOtherLicense.set(false);
     }
 
     /**
