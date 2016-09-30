@@ -97,6 +97,7 @@ Your table name and column name add to configuration application in setting tab.
 
 For create *.msi run tasks of gradle:
 
+- fill *.txt files
 - gradle clean
 - gradle assemble
 - gradle.build
@@ -144,3 +145,4 @@ if (this.phoneEmailService.access()){
 
 ## Release
 - Upload help
+- Add link in server fo help version

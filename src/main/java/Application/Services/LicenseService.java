@@ -1,13 +1,12 @@
 package Application.Services;
 
 import Application.Services.Application.SettingsService;
-import sun.misc.BASE64Decoder;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.ResourceBundle;
 
@@ -217,7 +216,7 @@ public class LicenseService {
         Key key = new SecretKeySpec(getSaltCipher(), "AES");
         Cipher c = Cipher.getInstance("AES");
         c.init(Cipher.DECRYPT_MODE, key);
-        byte[] decordedValue = new BASE64Decoder().decodeBuffer(encryptedValue);
+        byte[] decordedValue = Base64.getDecoder().decode(encryptedValue);
         byte[] decValue = c.doFinal(decordedValue);
         String decryptedValue = new String(decValue);
         return decryptedValue;

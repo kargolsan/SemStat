@@ -51,9 +51,11 @@ public class HelpController implements Initializable {
      */
     @FXML
     public void home(){
-        String index = String.format("/Help/%1$s/index.html", "pl");
-        String url = getClass().getResource(index).toExternalForm();
-        this.webEngine.load(url);
+        String vApp = PropertyService.get("version", "Application/Resources/properties.properties");
+        String uApp = PropertyService.get("urlProject", "Application/Resources/properties.properties");
+        String index = String.format("%1$s/%2$s/%3$s/", uApp, "pl", vApp);
+
+        this.webEngine.load(index);
         this.webEngine.reload();
     }
 
