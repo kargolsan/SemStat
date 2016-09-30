@@ -1,0 +1,70 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>O aplikacji</h1>
+            <p>
+                Na początku program powstał z myślą o szukaniu unikatowych domen internetowych,
+                które posiadają wybraną frazę. Robot zaczynając pracę na zadanych stronach internetowych,
+                szuka kolejne strony internetowe zawierające wybraną frazę. Robot przeszukuje
+                internet do momentu przeanalizowania wszystkich zebranych linków.
+            </p>
+            <h3>Limit podstron dla domeny</h3>
+            <p>
+                Aby uściślić zakres przeszukiwania danej domeny (np, aby robot nie przeszukał
+                całego Facebook'a), program oferuje wprowadzenie limitu przeanalizowanych
+                podstron w wybranej domenie. Przykładowo limit 20 podstron dla domeny youtube.com,
+                spowoduje że robot przeanalizuje maksymalnie 20 pierwszo zebranych stron
+                internetowych w domenie youtube.com. Im większy limit tym praca robota trwa dłużej
+                a rezultaty wyszukiwania unikatowych domen dla frazy mogą być większe.
+            </p>
+            <h3>Od jakich stron robot zaczyna pracę?</h3>
+            <p>
+                Robot od czegoś musi zacząć pracę. Do tego celu służy zakładka <code>źródła</code>.
+                Robot może pobrać listę linków od których zacznie analizę frazy oraz poszukiwanie linków
+                do analizy kolejnych stron. W linkach można stosować szablon <code ng-non-bindable>{{keyword}}</code>, oznacza
+                to że wpisując przykładowo adres <code ng-non-bindable>http://wyszukiwarka.dev/?szukaj={{keyword}}</code>,
+                aplikacja automatycznie podmieni szablon z frazą podaną w aplikacji.
+                Nie zaleca się stosowania szablonu <code ng-non-bindable>{{keyword}}</code> w wyszukiwarkach,
+                które zabraniają używania robotów. Więcej informacji jak to zrobić nie łamiąc regulaminu
+                znajduje się w kolejnych akapitach.
+            </p>
+            <p>
+                Kolejnym źródłem w aplikacji jest Google API. Darmowa wersja pozwala wysłać do 100
+                zapytań dziennie na serwer Google. Konfigurację Google API, można wykonać w
+                ustawieniach przechodząc do zakładki <code>APIs</code>. Należy pamiętać że
+                jedno zapytanie do Google API, zwraca maksymalnie 10 wyników z adresami stron internetowych.
+                Im więcej zapytań na frazę, tym lepsze rezultaty analizy frazy.
+            </p>
+            <p>
+                Kolejną dostępną opcją dla źródeł, jest pole umożliwiające wklejenie tekstu z linkach,
+                z którego robot pobiera linki do stron internetowych. Tutaj można wkleić przykładowo
+                źródło kodu  strony internetowej. Tutaj przykładowo aby nie łamać regulaminu Google
+                warto ręcznie w wyszukiwarce pobrać 100 wyników dla danej frazy, a cały kod źródłowy
+                strony z wynikami wkleić do omawianego pola.
+            </p>
+            <h3>Procesor</h3>
+            <p>
+                Aplikacja umożliwia ustalenie limitu wątków z których korzysta aplikacja. Im więcej
+                wątków tym analiza szybciej trwa oraz łącze internetowe jest bardziej obciążane.
+            </p>
+            <h3>Zapis danych</h3>
+            <p>
+                Aplikacja ma dwie opcje zapisywania danych. Pierwszą jest format JSON, czyli dane
+                zapisywane do pliku <code>data.txt</code> w folderze <code>data</code>. Dane są zapisywane
+                w taki sposób aby nie powtórzyły się rekordy zawierające tą samą domenę oraz frazę.
+            </p>
+            <p>
+                Drugą opcją zapisu jest baza MySQL. Tutaj także robot sprawdza czy w bazie danych
+                nie znajduje się rekord z domeną i frazą, aby w bazie znajdowały się unikatowe rekordy.
+                Aplikacja umożliwia konfigurację nazw kolumn oraz nazwy tabeli w wybranej bazie MySQL.
+            </p>
+            <h3>Rozszerzenia domen</h3>
+            <p>
+                Aplikacja oferuje filtrowanie rozszerzeń analizowanych domen. Przykładowo w zakładce
+                <code>robot</code> wpisanie po przecinku domen <code>.pl, .eu</code> spowoduje
+                że analizowane będą wyłącznie strony z podanymi rozszerzeniami domen. Domyślnie
+                podawane domeny po każdym uruchomieniu aplikacji, można edytować w ustawieniach.
+            </p>
+        </div>
+    </div>
+</div>

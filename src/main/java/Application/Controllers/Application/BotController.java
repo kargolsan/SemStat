@@ -2,6 +2,7 @@ package Application.Controllers.Application;
 
 import java.net.URL;
 
+import Application.Services.Application.AnalyticsService;
 import Application.Services.Application.SettingsService;
 import Application.Services.PropertyService;
 import javafx.fxml.FXML;
@@ -95,6 +96,9 @@ public class BotController implements Initializable {
      */
     @FXML
     public void analyze(){
+
+        AnalyticsService analyticsService = new AnalyticsService();
+        analyticsService.send("Bot launched");
 
         String keyword = this.keyword.getText();
 

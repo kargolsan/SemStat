@@ -36,6 +36,11 @@
                            <fx:include fx:id="settings" source="Application/SettingsView.fxml" />
                        </content>
                    </Tab>
+                   <Tab closable="false" text="%tabs.help">
+                       <content>
+                           <fx:include fx:id="help" source="Application/HelpView.fxml" />
+                       </content>
+                   </Tab>
                </tabs>
                 </TabPane>
             </children>

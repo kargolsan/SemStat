@@ -1,6 +1,8 @@
 package Application.Controllers.Application;
 
 import java.net.URL;
+
+import Application.Services.Application.AnalyticsService;
 import javafx.fxml.FXML;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
@@ -156,6 +158,9 @@ public class SettingsController implements Initializable {
         this.saveDataFileController.save();
         this.saveDataMysqlController.save();
         this.otherLicenseController.save();
+
+        AnalyticsService analyticsService = new AnalyticsService();
+        analyticsService.send("Settings saved");
 
         LogsController.success(this.bundle.getString("tabs.settings.setting_saved"));
         AlertService.info(this.bundle.getString("dialog_alert.information"), null, this.bundle.getString("tabs.settings.setting_saved"));

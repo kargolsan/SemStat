@@ -1,0 +1,31 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Rozszerzenie Telefon & Email</h1>
+            <p>
+                Rozszerzenie to służy do wyszukiwania telefonów oraz adresów email do potencjalnych właścicieli domen internetowych,
+                które zawierają wybraną frazę.
+            </p>
+            <h3>Celność danych</h3>
+            <p>
+                Robot jako rezultat podaje listę znalezionych telefonów dla danej domeny. Każdy telefon ma przypisaną ilość
+                występowania w domenie internetowej. To samy dotyczy adresów email. Robot znajduje adresy email, które są na stronie
+                internetowej danej domeny. Jako wynik, robot podaje domenę oraz listę adresów email znajdujących się w tej domenie.
+                Do każdego email'a dołączana jest ilość występowania w domenie danego adresu email.
+            </p>
+            <h3>Zapisywanie danych</h3>
+            <p>
+                Wyniki są zapisywane do pliku <code>data.txt</code> w folderze aplikacji <code>data</code> do formatu JSON.
+                Aplikacja ma możliwość zapisywania rezultatów do bazy danych MySQL razem z podstawowymi danymi robota.
+                Rozszerzenie umożliwia podania nazwy kolumn w bazie dla telefonów i email'i. Wynik zapisywany jest w
+                postaci niezakodowanego JSON, dlatego typ kolumn należy ustawić na <code>text</code>.
+            </p>
+            <h3>Obciążenie robota</h3>
+            <p>
+                Stosując to rozszerzenie warto zwiększyć ilość wątków, aby szybkość działania robota znacznie wzrosła.
+                Jeżeli nie potrzebne Tobie są telefony i email'e, warto to rozszerzenie dezaktywować, aby nie wydłużało
+                działania innych rozszerzeń lub podstawowego działania robota.
+            </p>
+        </div>
+    </div>
+</div>

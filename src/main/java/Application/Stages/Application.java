@@ -1,5 +1,6 @@
 package Application.Stages;
 
+import Application.Services.Application.AnalyticsService;
 import Application.Services.AsyncService;
 import Application.Services.LanguageService;
 import Application.Services.LicenseService;
@@ -77,6 +78,21 @@ public class Application extends javafx.application.Application {
             primaryStage.show();
         } catch (Exception ex){
             logger.fatal("Problem podczas wczytywanie stage application.", ex);
+        }
+    }
+
+    /**
+     * Stop application
+     */
+    @Override
+    public void stop(){
+        AnalyticsService analyticsService = new AnalyticsService();
+        analyticsService.send("Application exit");
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

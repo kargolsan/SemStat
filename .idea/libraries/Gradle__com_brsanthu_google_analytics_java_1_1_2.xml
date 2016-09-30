@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.brsanthu:google-analytics-java:1.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.brsanthu/google-analytics-java/1.1.2/6cfa514b4d84bbeea9a9fbec9a0ad170dfded507/google-analytics-java-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.brsanthu/google-analytics-java/1.1.2/4dd95a4bbee23e567c76387748e6a0ac9acc2d61/google-analytics-java-1.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

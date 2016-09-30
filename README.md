@@ -102,7 +102,7 @@ For create *.msi run tasks of gradle:
 - gradle.build
 - gradle copyLibs
 - gradle copyDrivers
-- gradle copyUrls
+- gradle copyTxts
 - gradle launch4j
 - gradle msi create msi installer for architecture 32bit
 - gradle msi64 create msi installer for architecture 64bit
@@ -140,4 +140,7 @@ if (this.phoneEmailService.access()){
 - Add license methods
 - Add extension to license service
 - Add status license to settings -> others -> licenses
+- Add description to help section
 
+## Release
+- Upload help

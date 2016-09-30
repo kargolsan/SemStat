@@ -6,12 +6,11 @@ import Application.Controllers.Application.BottomStripController;
 import Application.Controllers.Application.LogsController;
 import Application.Controllers.Application.SourcesController;
 import Application.Models.Application.Log;
+import Application.Services.Application.AnalyticsService;
 import Application.Services.Application.BotService;
 import Application.Services.Application.LogService;
 import Application.Services.Application.SettingsService;
 import Application.Services.LicenseService;
-import Application.Services.PropertyService;
-import Modules.Bots.First.Controllers.FirstBotControllers;
 import Modules.Extensions.PhoneEmail.Models.PhoneEmail;
 import Modules.Extensions.PhoneEmail.Services.PhoneEmailService;
 import Modules.Extensions.PhoneEmail.Services.TableFactoryService;
@@ -133,6 +132,13 @@ public class PhoneEmailController implements Initializable {
         SettingsService.add("extension.phone_email.active", Objects.toString(this.active.isSelected()));
         SettingsService.add("extension.phone_email.mysqlColumnPhone", this.mysqlColumnPhone.getText());
         SettingsService.add("extension.phone_email.mysqlColumnEmail", this.mysqlColumnEmail.getText());
+
+        AnalyticsService analyticsService = new AnalyticsService();
+        if (this.active.isSelected()){
+            analyticsService.send("Extension Phone & Email turn on");
+        } else {
+            analyticsService.send("Extension Phone & Email turn on");
+        }
     }
 
     /**

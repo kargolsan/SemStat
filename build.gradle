@@ -28,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    compile group: "com.brsanthu", name: "google-analytics-java", version: "1.1.2"
     compile group: "org.apache.maven", name: "maven-artifact", version: "3.0.3"
     compile group: "joda-time", name: "joda-time", version: "2.9.4"
     compile group: "com.googlecode.libphonenumber", name: "libphonenumber", version: "7.7.1"
@@ -55,7 +56,7 @@ sourceSets {
         resources {
             srcDirs = ["src/main/java", "src/main/resources"]
             includes = ["**/*.fxml", "**/*.xml", "**/*.properties", "**/*.css",
-                        "**/*.png", "**/*.gif", "**/*.jpg", "**/*.ico"]
+                        "**/*.png", "**/*.gif", "**/*.jpg", "**/*.ico", "**/*.html", "**/*.js"]
         }
     }
 }
@@ -77,6 +78,7 @@ props.setProperty("default_robot_limit_sub_site_analyze_domain", "15")
 props.setProperty("user_agent", "Application SemStat ${version} for SEO & SEM. Visit www.itgolo.pl.")
 props.setProperty("default_bot_extensions_domain", ".pl, .com, .net, .info, .eu")
 props.setProperty("license_salt", "#123dsfg@werER##")
+props.setProperty("analytics", "UA-85009904-2")
 props.setProperty("url_app_versions", "${url}/appVersions.txt")
 props.store(file.newWriter(), null)
 
@@ -98,9 +100,11 @@ task copyDrivers(type: Copy) {
     from "$projectDir/drivers"
 }
 
-task copyUrls(type: Copy) {
+task copyTxts(type: Copy) {
     into "$buildDir/libs"
+    from "$projectDir/sources.txt"
     from "$projectDir/urls.txt"
+    from "$projectDir/excepts.txt"
 }
 
 task copyToLib(type: Copy) {
